@@ -19,7 +19,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from PIL import Image
 
-SERVER_URL = "http://127.0.0.1:8080"
+SERVER_URL = "http://127.0.0.1:5167"
 UPLOAD_URL = f"{SERVER_URL}/api/upload"
 
 GUEST_NAMES = [

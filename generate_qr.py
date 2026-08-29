@@ -300,7 +300,7 @@ def print_terminal_qr(url):
 def main():
     parser = argparse.ArgumentParser(description="Generate Wedding Wi-Fi QR Code")
     parser.add_argument("--ip", type=str, default=None, help="Explicit IP address (defaults to auto-detected Wi-Fi IP)")
-    parser.add_argument("--port", type=int, default=8080, help="Server port (default: 8080)")
+    parser.add_argument("--port", type=int, default=5167, help="Server port (default: 5167)")
     args = parser.parse_args()
 
     ip = args.ip if args.ip else get_local_ip()

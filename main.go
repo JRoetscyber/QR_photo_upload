@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	Port              = ":8080"
+	Port              = ":5167"
 	UploadsDirectory  = "./uploads"
 	DataFile          = "./data/photos.json"
 	MaxBodyLimitBytes = 150 * 1024 * 1024 // 150MB per batch request
