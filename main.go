@@ -24,15 +24,32 @@ import (
 )
 
 const (
-	Port              = ":5167"
+	DefaultPort       = ":5167"
 	UploadsDirectory  = "./uploads"
 	DataFile          = "./data/photos.json"
 	MaxBodyLimitBytes = 150 * 1024 * 1024 // 150MB per batch request
 	MaxDiskWriters    = 64                // Concurrent disk writes semaphore limit
-	AdminPIN          = "2026"            // Admin access PIN for the couple
+	DefaultAdminPIN   = "2026"            // Default admin access PIN
+)
+
+var (
+	Port     = DefaultPort
+	AdminPIN = DefaultAdminPIN
 )
 
 func main() {
+	// Read environment variables if provided (for Docker / Cloudflare deployment)
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		if !strings.HasPrefix(envPort, ":") {
+			Port = ":" + envPort
+		} else {
+			Port = envPort
+		}
+	}
+	if envPIN := os.Getenv("ADMIN_PIN"); envPIN != "" {
+		AdminPIN = envPIN
+	}
+
 	// Initialize thread-safe storage engine
 	store, err := storage.NewStore(UploadsDirectory, DataFile, MaxDiskWriters)
 	if err != nil {

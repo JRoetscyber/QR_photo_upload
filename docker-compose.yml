@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  wedding_server:
+    build: .
+    container_name: wedding_server
+    restart: unless-stopped
+    environment:
+      - PORT=5167
+      - ADMIN_PIN=2026
+    volumes:
+      # Persistent storage on host machine
+      - ./uploads:/app/uploads
+      - ./data:/app/data
+    networks:
+      # Attach to your Cloudflare Tunnel docker network
+      - cloudflare_tunnel_net
+    ports:
+      # Optional: also expose locally on host if needed
+      - "5167:5167"
+
+networks:
+  cloudflare_tunnel_net:
+    # If your existing cloudflared container is already on an existing Docker network:
+    name: cloudflare_tunnel_net
+    external: false

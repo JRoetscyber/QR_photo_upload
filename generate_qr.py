@@ -298,16 +298,22 @@ def print_terminal_qr(url):
     print("="*50 + "\n")
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate Wedding Wi-Fi QR Code")
+    parser = argparse.ArgumentParser(description="Generate Wedding Wi-Fi / Domain QR Code")
+    parser.add_argument("--url", type=str, default=None, help="Custom public domain URL (e.g. https://photos.yourdomain.com)")
     parser.add_argument("--ip", type=str, default=None, help="Explicit IP address (defaults to auto-detected Wi-Fi IP)")
     parser.add_argument("--port", type=int, default=5167, help="Server port (default: 5167)")
     args = parser.parse_args()
 
-    ip = args.ip if args.ip else get_local_ip()
-    port = args.port
-    url = f"http://{ip}:{port}"
+    if args.url:
+        url = args.url.rstrip("/")
+        ip = "Domain / Cloudflare"
+        port = ""
+    else:
+        ip = args.ip if args.ip else get_local_ip()
+        port = args.port
+        url = f"http://{ip}:{port}"
 
-    print(f"📡 Detected local Wi-Fi network address: {ip}")
+    print(f"📡 Target Host: {ip}")
     print(f"🔗 Target Wedding Upload URL: {url}")
 
     # Generate PNG
