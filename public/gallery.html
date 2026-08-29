@@ -95,14 +95,36 @@
       flex-direction: column;
       animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .grid-item img {
+    .img-lazy-holder {
+      position: relative;
       width: 100%;
       height: 280px;
+      background: #1e222d;
+      overflow: hidden;
+    }
+    .img-lazy-holder.loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+      animation: galleryShimmer 1.5s infinite;
+    }
+    @keyframes galleryShimmer {
+      100% { transform: translateX(100%); }
+    }
+    .grid-item img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.4s ease;
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
-    .grid-item:hover img {
+    .grid-item img.loaded {
+      opacity: 1;
+    }
+    .grid-item:hover img.loaded {
       transform: scale(1.03);
     }
     .grid-info {
@@ -255,6 +277,29 @@
       }
     }
 
+    // Setup IntersectionObserver for gallery grid
+    const galleryImageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const holder = img.parentElement;
+          const src = img.getAttribute('data-src');
+          if (src) {
+            img.src = src;
+            img.onload = () => {
+              img.classList.add('loaded');
+              if (holder) holder.classList.remove('loading');
+            };
+            img.onerror = () => {
+              if (holder) holder.classList.remove('loading');
+            };
+            img.removeAttribute('data-src');
+          }
+          observer.unobserve(img);
+        }
+      });
+    }, { rootMargin: '300px 0px' });
+
     function renderGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
@@ -262,9 +307,16 @@
         const item = document.createElement('div');
         item.className = 'grid-item';
 
+        const holder = document.createElement('div');
+        holder.className = 'img-lazy-holder loading';
+
         const img = document.createElement('img');
-        img.src = photo.url;
+        img.setAttribute('data-src', photo.url);
         img.loading = 'lazy';
+        img.decoding = 'async';
+        img.alt = photo.guest_name || 'Wedding moment';
+
+        holder.appendChild(img);
 
         const info = document.createElement('div');
         info.className = 'grid-info';
@@ -282,9 +334,11 @@
           info.appendChild(wish);
         }
 
-        item.appendChild(img);
+        item.appendChild(holder);
         item.appendChild(info);
         grid.appendChild(item);
+
+        galleryImageObserver.observe(img);
       });
     }
 

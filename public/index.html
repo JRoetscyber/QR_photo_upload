@@ -358,12 +358,38 @@
       transform: translateY(-2px);
     }
 
-    .gallery-card img {
+    .img-lazy-wrapper {
+      position: relative;
       width: 100%;
       aspect-ratio: 1;
+      background: #eee8e0;
+      overflow: hidden;
+    }
+
+    .img-lazy-wrapper.loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+      animation: shimmer 1.4s infinite;
+    }
+
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+
+    .gallery-card img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       display: block;
-      background: #f4efe9;
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    .gallery-card img.loaded {
+      opacity: 1;
     }
 
     .gallery-card-info {
@@ -702,6 +728,29 @@
       }
     }
 
+    // Setup IntersectionObserver for smooth progressive lazy loading
+    const lazyImageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const wrapper = img.parentElement;
+          const src = img.getAttribute('data-src');
+          if (src) {
+            img.src = src;
+            img.onload = () => {
+              img.classList.add('loaded');
+              if (wrapper) wrapper.classList.remove('loading');
+            };
+            img.onerror = () => {
+              if (wrapper) wrapper.classList.remove('loading');
+            };
+            img.removeAttribute('data-src');
+          }
+          observer.unobserve(img);
+        }
+      });
+    }, { rootMargin: '200px 0px' });
+
     function renderGallery(photos) {
       galleryFeed.innerHTML = '';
       if (photos.length === 0) {
@@ -714,9 +763,16 @@
         card.className = 'gallery-card';
         card.onclick = () => openLightbox(photo.url);
 
+        const imgWrapper = document.createElement('div');
+        imgWrapper.className = 'img-lazy-wrapper loading';
+
         const img = document.createElement('img');
-        img.src = photo.url;
+        img.setAttribute('data-src', photo.url);
         img.loading = 'lazy';
+        img.decoding = 'async';
+        img.alt = photo.guest_name || 'Wedding moment';
+
+        imgWrapper.appendChild(img);
 
         const info = document.createElement('div');
         info.className = 'gallery-card-info';
@@ -734,9 +790,12 @@
           info.appendChild(wish);
         }
 
-        card.appendChild(img);
+        card.appendChild(imgWrapper);
         card.appendChild(info);
         galleryFeed.appendChild(card);
+
+        // Observe for lazy loading
+        lazyImageObserver.observe(img);
       });
     }
 

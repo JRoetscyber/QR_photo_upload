@@ -388,8 +388,22 @@
       position: relative;
       width: 100%;
       height: 220px;
-      background: #000;
+      background: #181b24;
+      overflow: hidden;
       cursor: pointer;
+    }
+
+    .card-thumb.loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.12), transparent);
+      animation: adminShimmer 1.5s infinite;
+    }
+
+    @keyframes adminShimmer {
+      100% { transform: translateX(100%); }
     }
 
     .card-thumb img {
@@ -397,6 +411,12 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    .card-thumb img.loaded {
+      opacity: 1;
     }
 
     .star-badge {
@@ -800,7 +820,35 @@
       renderPhotosGrid(filtered);
     }
 
+    // Setup IntersectionObserver for admin photo cards
+    const adminImageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const thumb = img.parentElement;
+          const src = img.getAttribute('data-src');
+          if (src) {
+            img.src = src;
+            img.onload = () => {
+              img.classList.add('loaded');
+              if (thumb) thumb.classList.remove('loading');
+            };
+            img.onerror = () => {
+              if (thumb) thumb.classList.remove('loading');
+            };
+            img.removeAttribute('data-src');
+          }
+          observer.unobserve(img);
+        }
+      });
+    }, { rootMargin: '300px 0px' });
+
+    let currentRenderLimit = 40;
+    let filteredPhotosCache = [];
+
     function renderPhotosGrid(photos) {
+      filteredPhotosCache = photos;
+      currentRenderLimit = 40;
       const grid = document.getElementById('photoGrid');
       grid.innerHTML = '';
 
@@ -809,17 +857,25 @@
         return;
       }
 
-      photos.forEach(photo => {
+      appendPhotosChunk(photos.slice(0, currentRenderLimit));
+    }
+
+    function appendPhotosChunk(chunk) {
+      const grid = document.getElementById('photoGrid');
+      
+      chunk.forEach(photo => {
         const card = document.createElement('div');
         card.className = 'admin-card';
 
         const thumb = document.createElement('div');
-        thumb.className = 'card-thumb';
+        thumb.className = 'card-thumb loading';
         thumb.onclick = () => openLightbox(photo.url);
 
         const img = document.createElement('img');
-        img.src = photo.url;
+        img.setAttribute('data-src', photo.url);
         img.loading = 'lazy';
+        img.decoding = 'async';
+        img.alt = photo.guest_name || 'Wedding moment';
 
         const starBtn = document.createElement('div');
         starBtn.className = `star-badge ${photo.favorite ? 'starred' : ''}`;
@@ -867,8 +923,40 @@
         card.appendChild(thumb);
         card.appendChild(body);
         grid.appendChild(card);
+
+        adminImageObserver.observe(img);
       });
+
+      // If more photos remain, render infinite scroll trigger
+      if (currentRenderLimit < filteredPhotosCache.length) {
+        let loadMoreTrigger = document.getElementById('loadMoreTrigger');
+        if (!loadMoreTrigger) {
+          loadMoreTrigger = document.createElement('div');
+          loadMoreTrigger.id = 'loadMoreTrigger';
+          loadMoreTrigger.style.gridColumn = '1 / -1';
+          loadMoreTrigger.style.textAlign = 'center';
+          loadMoreTrigger.style.padding = '20px';
+          loadMoreTrigger.innerHTML = '<span style="color:var(--gold-primary); font-size:13px;">Scroll down for more photos...</span>';
+          grid.appendChild(loadMoreTrigger);
+        }
+      }
     }
+
+    // Window scroll event for infinite lazy batching
+    window.addEventListener('scroll', () => {
+      if (currentRenderLimit < filteredPhotosCache.length) {
+        const scrollPosition = window.innerHeight + window.scrollY;
+        const bodyHeight = document.documentElement.scrollHeight;
+        if (scrollPosition >= bodyHeight - 400) {
+          const nextLimit = currentRenderLimit + 40;
+          const nextChunk = filteredPhotosCache.slice(currentRenderLimit, nextLimit);
+          currentRenderLimit = nextLimit;
+          const trigger = document.getElementById('loadMoreTrigger');
+          if (trigger) trigger.remove();
+          appendPhotosChunk(nextChunk);
+        }
+      }
+    });
 
     // Photo Moderation Actions
     async function toggleFavorite(id) {
