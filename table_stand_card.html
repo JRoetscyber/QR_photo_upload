@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Your Wedding Memories - Table Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold-primary: #c59b27;
+      --gold-light: #f5e6be;
+      --charcoal: #2d3142;
+      --cream: #faf8f5;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #eef1f6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      color: var(--charcoal);
+    }
+    .print-actions {
+      margin-bottom: 24px;
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      background: var(--gold-primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(197, 155, 39, 0.35);
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(197, 155, 39, 0.45);
+    }
+    .btn-secondary {
+      background: white;
+      color: var(--charcoal);
+      border: 1px solid #ddd;
+    }
+
+    /* Printable Card (4x6 / 5x7 ratio) */
+    .card {
+      width: 380px;
+      min-height: 540px;
+      background: var(--cream);
+      border: 1px solid #e0d8cc;
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+      padding: 36px 28px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border: 1.5px solid var(--gold-primary);
+      border-radius: 10px;
+      pointer-events: none;
+    }
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 16px;
+      border: 0.5px solid var(--gold-light);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+    .rings-icon {
+      font-size: 32px;
+      margin-bottom: 6px;
+      color: var(--gold-primary);
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    .subtitle {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 18px;
+      color: var(--gold-primary);
+      margin-bottom: 20px;
+    }
+    .qr-container {
+      background: white;
+      padding: 14px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      display: inline-block;
+      margin-bottom: 18px;
+      border: 1px solid #eee;
+    }
+    .qr-container img {
+      display: block;
+      width: 190px;
+      height: 190px;
+    }
+    .instructions {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .instructions strong {
+      color: var(--charcoal);
+    }
+    .url-badge {
+      display: inline-block;
+      background: #f0ebe1;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--charcoal);
+      letter-spacing: 0.5px;
+    }
+    .wifi-note {
+      font-size: 11px;
+      color: #888;
+      margin-top: 14px;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .print-actions {
+        display: none;
+      }
+      .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        margin: auto;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-actions">
+    <button class="btn" onclick="window.print()">🖨️ Print Table Stand Card</button>
+    <a href="http://192.168.50.191:8080" target="_blank" style="text-decoration:none;">
+      <button class="btn btn-secondary">🌐 Open Web Upload Portal</button>
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="rings-icon">💍</div>
+    <h1>Capture the Love</h1>
+    <div class="subtitle">Share your photos from tonight</div>
+
+    <div class="qr-container">
+      <img src="wedding_qr.png" alt="Wedding Upload QR Code">
+    </div>
+
+    <p class="instructions">
+      Open your phone camera, scan the QR code,<br>
+      and upload all your candid moments!
+    </p>
+
+    <div class="url-badge">http://192.168.50.191:8080</div>
+
+    <p class="wifi-note">
+      📶 Connect to the venue Wi-Fi to upload instantly!
+    </p>
+  </div>
+
+</body>
+</html>

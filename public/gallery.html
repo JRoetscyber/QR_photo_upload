@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Wedding Photo Stream</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #d4af37;
+      --gold-light: #fef5dd;
+      --bg-dark: #1a1c23;
+      --card-bg: rgba(35, 38, 48, 0.85);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at center, #232733 0%, #12141a 100%);
+      color: #f0ebe1;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 24px;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+      margin-bottom: 24px;
+    }
+    .title-group h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 38px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+    .title-group p {
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .badge {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .ctrl-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .ctrl-btn:hover {
+      background: var(--gold);
+      color: #12141a;
+    }
+
+    /* Masonry / Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .grid-item {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .grid-item img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .grid-item:hover img {
+      transform: scale(1.03);
+    }
+    .grid-info {
+      padding: 14px 16px;
+      background: rgba(20, 22, 28, 0.95);
+    }
+    .guest-name {
+      font-weight: 600;
+      color: var(--gold);
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .wish-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 15px;
+      color: #ddd;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* New Photo Toast Notification */
+    .toast-overlay {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(18, 20, 26, 0.95);
+      border: 1.5px solid var(--gold);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      transform: translateY(150%);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 999;
+      max-width: 400px;
+    }
+    .toast-overlay.active {
+      transform: translateY(0);
+    }
+    .toast-img {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+    .toast-content h4 {
+      color: var(--gold);
+      font-size: 14px;
+    }
+    .toast-content p {
+      font-size: 12px;
+      color: #bbb;
+      margin-top: 2px;
+    }
+
+    /* Slideshow Fullscreen Mode */
+    .slideshow-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .slideshow-img {
+      max-width: 90vw;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
+    }
+    .slideshow-caption {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .slideshow-guest {
+      font-size: 20px;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .slideshow-wish {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 22px;
+      color: #fff;
+      margin-top: 6px;
+    }
+
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="title-group">
+      <h1>💍 Wedding Moments Live Wall</h1>
+      <p>Real-time guest uploads streaming via fast Fasthttp engine</p>
+    </div>
+    <div class="controls">
+      <span id="photoCount" class="badge">0 Memories Shared</span>
+      <button class="ctrl-btn" onclick="toggleSlideshow()">▶️ Start Slideshow</button>
+      <button class="ctrl-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <div id="grid" class="grid"></div>
+
+  <!-- Live Toast -->
+  <div id="toast" class="toast-overlay">
+    <img id="toastImg" class="toast-img" src="" alt="New Photo">
+    <div class="toast-content">
+      <h4 id="toastTitle">New Memory Added!</h4>
+      <p id="toastWish"></p>
+    </div>
+  </div>
+
+  <!-- Slideshow Modal -->
+  <div id="slideshowModal" class="slideshow-modal" onclick="toggleSlideshow()">
+    <img id="slideshowImg" class="slideshow-img" src="" alt="Slideshow">
+    <div class="slideshow-caption">
+      <div id="slideshowGuest" class="slideshow-guest"></div>
+      <div id="slideshowWish" class="slideshow-wish"></div>
+    </div>
+  </div>
+
+  <script>
+    let photosList = [];
+    let isSlideshow = false;
+    let slideshowIdx = 0;
+    let slideshowTimer = null;
+
+    async function loadAllPhotos() {
+      try {
+        const res = await fetch('/api/photos?limit=100');
+        const data = await res.json();
+        photosList = data.photos || [];
+        document.getElementById('photoCount').innerText = `${data.total || 0} Memories Shared`;
+        renderGrid();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      photosList.forEach(photo => {
+        const item = document.createElement('div');
+        item.className = 'grid-item';
+
+        const img = document.createElement('img');
+        img.src = photo.url;
+        img.loading = 'lazy';
+
+        const info = document.createElement('div');
+        info.className = 'grid-info';
+
+        const name = document.createElement('div');
+        name.className = 'guest-name';
+        name.innerHTML = `<span>📸 ${photo.guest_name || 'Guest'}</span>`;
+
+        info.appendChild(name);
+
+        if (photo.wish) {
+          const wish = document.createElement('div');
+          wish.className = 'wish-text';
+          wish.innerText = `"${photo.wish}"`;
+          info.appendChild(wish);
+        }
+
+        item.appendChild(img);
+        item.appendChild(info);
+        grid.appendChild(item);
+      });
+    }
+
+    // Connect to Server-Sent Events (SSE) stream for instant real-time live push
+    function connectLiveStream() {
+      const evtSource = new EventSource('/api/stream');
+
+      evtSource.addEventListener('new_photo', (e) => {
+        const photo = JSON.parse(e.data);
+        photosList.unshift(photo);
+        document.getElementById('photoCount').innerText = `${photosList.length} Memories Shared`;
+        renderGrid();
+        showToast(photo);
+      });
+
+      evtSource.onerror = () => {
+        setTimeout(connectLiveStream, 5000);
+      };
+    }
+
+    function showToast(photo) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastImg').src = photo.url;
+      document.getElementById('toastTitle').innerText = `✨ ${photo.guest_name || 'A guest'} just uploaded!`;
+      document.getElementById('toastWish').innerText = photo.wish ? `"${photo.wish}"` : 'New photo shared to the wall';
+
+      toast.classList.add('active');
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 4500);
+    }
+
+    // Slideshow functions
+    function toggleSlideshow() {
+      isSlideshow = !isSlideshow;
+      const modal = document.getElementById('slideshowModal');
+      if (isSlideshow && photosList.length > 0) {
+        modal.style.display = 'flex';
+        slideshowIdx = 0;
+        showNextSlide();
+        slideshowTimer = setInterval(showNextSlide, 4500);
+      } else {
+        modal.style.display = 'none';
+        clearInterval(slideshowTimer);
+      }
+    }
+
+    function showNextSlide() {
+      if (photosList.length === 0) return;
+      const photo = photosList[slideshowIdx % photosList.length];
+      document.getElementById('slideshowImg').src = photo.url;
+      document.getElementById('slideshowGuest').innerText = `📸 Captured by ${photo.guest_name || 'Guest'}`;
+      document.getElementById('slideshowWish').innerText = photo.wish ? `"${photo.wish}"` : '';
+      slideshowIdx++;
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    loadAllPhotos();
+    connectLiveStream();
+  </script>
+</body>
+</html>
