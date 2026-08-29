@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
 Wedding Server High-Concurrency Load Test
-Simulates 60+ simultaneous guests uploading photos at the exact same moment.
+Simulates N simultaneous guests uploading photos at the exact same moment.
 Measures latency, throughput, success rate, and verifies server resilience.
 """
 
 import sys
 import io
 import time
+import argparse
 import urllib.request
 import urllib.parse
 import json
@@ -20,7 +21,6 @@ from PIL import Image
 
 SERVER_URL = "http://127.0.0.1:8080"
 UPLOAD_URL = f"{SERVER_URL}/api/upload"
-CONCURRENT_USERS = 60
 
 GUEST_NAMES = [
     "David & Sarah", "Jessica Miller", "Uncle Bob", "Aunt Clara", "Emily & James",
@@ -69,13 +69,13 @@ def upload_worker(user_idx):
 
     boundary = f"----WebKitFormBoundary{int(time.time() * 1000)}_{user_idx}"
     
-    # Build multipart/form-data payload manually
+    # Build multipart/form-data payload
     body = bytearray()
     
     # Field: guest_name
     body.extend(f"--{boundary}\r\n".encode("utf-8"))
     body.extend(f'Content-Disposition: form-data; name="guest_name"\r\n\r\n'.encode("utf-8"))
-    body.extend(f"{guest}\r\n".encode("utf-8"))
+    body.extend(f"{guest} #{user_idx+1}\r\n".encode("utf-8"))
     
     # Field: wish
     body.extend(f"--{boundary}\r\n".encode("utf-8"))
@@ -104,10 +104,10 @@ def upload_worker(user_idx):
 
     start_time = time.time()
     try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=15) as resp:
             elapsed = time.time() - start_time
             status = resp.status
-            resp_body = resp.read()
+            resp.read()
             return {
                 "user_id": user_idx + 1,
                 "guest": guest,
@@ -127,26 +127,30 @@ def upload_worker(user_idx):
             "error": str(e)
         }
 
-def run_test():
-    print(f"🚀 Starting High-Concurrency Load Test: {CONCURRENT_USERS} simultaneous guest uploads...")
+def run_test(concurrent_users=300):
+    print(f"🚀 Starting High-Concurrency Stress Test: {concurrent_users} simultaneous photo uploads...")
     print(f"🎯 Target Endpoint: {UPLOAD_URL}")
 
     start_wall = time.time()
     results = []
 
-    with ThreadPoolExecutor(max_workers=CONCURRENT_USERS) as executor:
-        futures = [executor.submit(upload_worker, i) for i in range(CONCURRENT_USERS)]
+    with ThreadPoolExecutor(max_workers=concurrent_users) as executor:
+        futures = [executor.submit(upload_worker, i) for i in range(concurrent_users)]
         for future in as_completed(futures):
             results.append(future.result())
 
     total_time = time.time() - start_wall
     successes = [r for r in results if r["success"]]
     failures = [r for r in results if not r["success"]]
-    latencies = [r["latency_ms"] for r in results]
+    latencies = sorted([r["latency_ms"] for r in results])
 
-    print("\n" + "="*55)
-    print(" 📊 LOAD TEST RESULTS (60 CONCURRENT UPLOADS)")
-    print("="*55)
+    p50 = latencies[int(len(latencies) * 0.50)] if latencies else 0
+    p95 = latencies[int(len(latencies) * 0.95)] if latencies else 0
+    p99 = latencies[int(len(latencies) * 0.99)] if latencies else 0
+
+    print("\n" + "="*58)
+    print(f" 📊 STRESS TEST RESULTS ({concurrent_users} CONCURRENT UPLOADS)")
+    print("="*58)
     print(f"Total Requests Dispatched:  {len(results)}")
     print(f"Successful Uploads:         {len(successes)} / {len(results)} ({len(successes)/len(results)*100:.1f}%)")
     print(f"Failed Uploads:             {len(failures)}")
@@ -154,9 +158,12 @@ def run_test():
     print(f"Throughput:                 {len(results)/total_time:.2f} requests/sec")
     if latencies:
         print(f"Min Latency:                {min(latencies)} ms")
+        print(f"p50 (Median) Latency:       {p50} ms")
+        print(f"p95 Latency:                {p95} ms")
+        print(f"p99 Latency:                {p99} ms")
         print(f"Max Latency:                {max(latencies)} ms")
         print(f"Average Latency:            {sum(latencies)/len(latencies):.1f} ms")
-    print("="*55)
+    print("="*58)
 
     if failures:
         print("\n⚠️ Failure Details:")
@@ -170,9 +177,12 @@ def run_test():
             print(f"\n📦 Verified Server Stats:")
             print(f"  Total Photos in Disk Store: {stats.get('total_photos')}")
             print(f"  Total Unique Guests:        {stats.get('total_guests')}")
-            print(f"  Total Storage Used:         {stats.get('total_bytes') / 1024:.1f} KB")
+            print(f"  Total Storage Used:         {stats.get('total_bytes') / (1024*1024):.2f} MB")
     except Exception as e:
         print(f"Could not query stats: {e}")
 
 if __name__ == "__main__":
-    run_test()
+    parser = argparse.ArgumentParser(description="Wedding Server Load Test")
+    parser.add_argument("--count", type=int, default=300, help="Number of concurrent uploads (default: 300)")
+    args = parser.parse_args()
+    run_test(args.count)
