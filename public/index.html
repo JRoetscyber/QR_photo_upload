@@ -638,7 +638,54 @@
       });
     }
 
-    // High Concurrency Chunked / Multipart Upload
+    // High-Speed F1-Grade Canvas Image Compressor
+    async function compressImage(file, maxDimension = 2000, quality = 0.85) {
+      if (file.size < 400 * 1024) return file; // Skip tiny files
+
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(img.src);
+          let { width, height } = img;
+
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob || blob.size >= file.size) {
+                resolve(file);
+              } else {
+                const optimizedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+                  type: "image/jpeg",
+                  lastModified: Date.now()
+                });
+                resolve(optimizedFile);
+              }
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+        img.onerror = () => resolve(file);
+      });
+    }
+
+    // High Concurrency Turbo Upload
     async function handleUpload() {
       if (selectedFiles.length === 0) return;
 
@@ -647,15 +694,23 @@
 
       uploadBtn.disabled = true;
       progressContainer.style.display = 'block';
-      progressBarFill.style.width = '10%';
-      progressText.innerText = 'Preparing your memories...';
+      progressBarFill.style.width = '15%';
+      progressText.innerText = '⚡ Turbo-optimizing photos...';
       alertBox.style.display = 'none';
+
+      const uploadStartTime = performance.now();
+
+      // Parallel client-side compression
+      const compressedFiles = await Promise.all(selectedFiles.map(f => compressImage(f)));
+
+      progressBarFill.style.width = '35%';
+      progressText.innerText = '🚀 Fast-streaming to server...';
 
       const formData = new FormData();
       formData.append('guest_name', guestName);
       formData.append('wish', wish);
 
-      selectedFiles.forEach(file => {
+      compressedFiles.forEach(file => {
         formData.append('photos', file, file.name);
       });
 
@@ -664,27 +719,28 @@
 
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
-          const percent = Math.round((e.loaded / e.total) * 100);
+          const percent = 35 + Math.round((e.loaded / e.total) * 65);
           progressBarFill.style.width = percent + '%';
-          progressText.innerText = `Uploading... ${percent}%`;
+          progressText.innerText = `Streaming... ${percent}%`;
         }
       };
 
       xhr.onload = () => {
+        const totalDuration = Math.round(performance.now() - uploadStartTime);
         if (xhr.status === 201 || xhr.status === 200) {
           const res = JSON.parse(xhr.responseText);
           progressBarFill.style.width = '100%';
-          progressText.innerText = 'Upload complete!';
+          progressText.innerText = `⚡ Uploaded in ${totalDuration}ms!`;
 
           // Confetti celebration 🎉
           confetti({
-            particleCount: 80,
-            spread: 70,
+            particleCount: 90,
+            spread: 75,
             origin: { y: 0.6 },
             colors: ['#d4af37', '#fdf1cd', '#e74c3c', '#ffffff']
           });
 
-          showAlert(`✨ Thank you ${guestName}! ${res.count} photo(s) saved.`, 'success');
+          showAlert(`✨ Thank you ${guestName}! ${res.count} photo(s) saved in ${totalDuration}ms.`, 'success');
 
           // Reset inputs
           selectedFiles = [];
@@ -693,7 +749,7 @@
           setTimeout(() => {
             progressContainer.style.display = 'none';
             progressBarFill.style.width = '0%';
-          }, 2000);
+          }, 2500);
 
           fetchRecentPhotos();
         } else {

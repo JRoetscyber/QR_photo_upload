@@ -21,6 +21,10 @@ venv/
 .venv/
 env/
 
+# Fiber cache
+*.fiber.*
+*.fiber.gz
+
 # IDE & OS
 .vscode/
 .idea/
