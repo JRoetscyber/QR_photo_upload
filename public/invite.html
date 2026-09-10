@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Jonathan & Bride | South African Highveld Wedding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti for celebratory RSVP feedback -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --gold-savannah: #d4a359;
+      --gold-light: #f7edd8;
+      --copper-earth: #c87d55;
+      --bush-green: #243d2c;
+      --bush-green-dark: #16261b;
+      --sandstone-bg: #f9f5ef;
+      --sandstone-card: #ffffff;
+      --charcoal: #1c211e;
+      --text-muted: #5e6660;
+      --border-color: rgba(212, 163, 89, 0.35);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--sandstone-bg);
+      color: var(--charcoal);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Floating Navigation */
+    .nav-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(249, 245, 239, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--bush-green);
+      letter-spacing: 1px;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--charcoal);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--gold-savannah);
+    }
+
+    .nav-rsvp-btn {
+      background: var(--bush-green);
+      color: white !important;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-weight: 600 !important;
+      transition: all 0.2s !important;
+    }
+
+    .nav-rsvp-btn:hover {
+      background: var(--gold-savannah);
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section with Highveld Landscape Vibe */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 20px 60px;
+      background: linear-gradient(180deg, rgba(22, 38, 27, 0.78) 0%, rgba(36, 61, 44, 0.85) 60%, rgba(249, 245, 239, 1) 100%),
+                  radial-gradient(circle at 50% 30%, #d4a359 0%, #16261b 80%);
+      color: white;
+    }
+
+    .hero-protea-icon {
+      font-size: 42px;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 4px 12px rgba(212, 163, 89, 0.5));
+    }
+
+    .hero-tag {
+      font-family: 'Montserrat', sans-serif;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 4px;
+      color: var(--gold-savannah);
+      margin-bottom: 14px;
+    }
+
+    .hero-names {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(46px, 9vw, 84px);
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: 2px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      margin-bottom: 12px;
+    }
+
+    .hero-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(20px, 4vw, 30px);
+      color: var(--gold-light);
+      margin-bottom: 28px;
+    }
+
+    .hero-date-badge {
+      display: inline-block;
+      border-top: 1px solid rgba(212, 163, 89, 0.6);
+      border-bottom: 1px solid rgba(212, 163, 89, 0.6);
+      padding: 10px 24px;
+      font-size: 15px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 34px;
+    }
+
+    /* Live Countdown */
+    .countdown-container {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .countdown-box {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(212, 163, 89, 0.4);
+      border-radius: 14px;
+      padding: 14px 16px;
+      min-width: 74px;
+    }
+
+    .countdown-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--gold-savannah);
+      line-height: 1;
+    }
+
+    .countdown-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 4px;
+    }
+
+    .hero-btn {
+      background: linear-gradient(135deg, var(--gold-savannah), var(--copper-earth));
+      color: white;
+      text-decoration: none;
+      padding: 16px 36px;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      box-shadow: 0 8px 24px rgba(200, 125, 85, 0.4);
+      transition: all 0.25s ease;
+    }
+
+    .hero-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(200, 125, 85, 0.55);
+    }
+
+    /* Content Containers */
+    .section-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-header .tag {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--copper-earth);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .section-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(34px, 6vw, 46px);
+      color: var(--bush-green);
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .section-header .divider {
+      width: 60px;
+      height: 2px;
+      background: var(--gold-savannah);
+      margin: 14px auto 0;
+    }
+
+    /* Story Card */
+    .story-card {
+      background: var(--sandstone-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+
+    .story-card p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px;
+      line-height: 1.8;
+      color: #333;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Schedule Timeline */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .timeline-item {
+      background: var(--sandstone-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 28px 22px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+      position: relative;
+      transition: transform 0.2s;
+    }
+
+    .timeline-item:hover {
+      transform: translateY(-4px);
+    }
+
+    .timeline-time {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--copper-earth);
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+      display: inline-block;
+      background: var(--gold-light);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .timeline-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--bush-green);
+      margin-bottom: 6px;
+    }
+
+    .timeline-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Venue & Map Card */
+    .venue-card {
+      background: var(--sandstone-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 36px 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .venue-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .venue-info h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 30px;
+      color: var(--bush-green);
+      margin-bottom: 12px;
+    }
+
+    .venue-info p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      line-height: 1.7;
+    }
+
+    .btn-map {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bush-green);
+      color: white;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-map:hover {
+      background: var(--gold-savannah);
+    }
+
+    /* Interactive RSVP Section */
+    .rsvp-section {
+      background: linear-gradient(180deg, #1c2c20 0%, #16241a 100%);
+      color: white;
+      padding: 90px 20px;
+      position: relative;
+    }
+
+    .rsvp-section .section-header h2 {
+      color: var(--gold-savannah);
+    }
+
+    .rsvp-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(212, 163, 89, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 40px 30px;
+      max-width: 640px;
+      margin: 0 auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    /* Attendance Toggle Radio */
+    .attending-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .toggle-option {
+      position: relative;
+    }
+
+    .toggle-option input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .toggle-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 12px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .toggle-option input:checked + .toggle-label {
+      background: var(--gold-savannah);
+      border-color: var(--gold-savannah);
+      color: #16241a;
+      font-weight: 600;
+    }
+
+    .toggle-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--gold-savannah);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: white;
+      font-family: inherit;
+      font-size: 14.5px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--gold-savannah);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .form-textarea {
+      height: 80px;
+      resize: none;
+    }
+
+    .form-select option {
+      background: #1c2c20;
+      color: white;
+    }
+
+    .submit-rsvp-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold-savannah), var(--copper-earth));
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(212, 163, 89, 0.4);
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+
+    .submit-rsvp-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(212, 163, 89, 0.55);
+    }
+
+    .submit-rsvp-btn:disabled {
+      background: #555;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* RSVP Success Alert Card */
+    .rsvp-alert {
+      display: none;
+      background: rgba(46, 204, 113, 0.2);
+      border: 1.5px solid #2ecc71;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .rsvp-alert h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      color: #2ecc71;
+      margin-bottom: 6px;
+    }
+
+    /* Details Grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .info-box {
+      background: var(--sandstone-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 30px 24px;
+      text-align: center;
+    }
+
+    .info-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .info-box h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      color: var(--bush-green);
+      margin-bottom: 10px;
+    }
+
+    .info-box p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bush-green-dark);
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 13px;
+    }
+
+    .footer a {
+      color: var(--gold-savannah);
+      text-decoration: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Navigation -->
+  <nav class="nav-header">
+    <a href="#" class="nav-brand">J & B</a>
+    <div class="nav-links">
+      <a href="#schedule">Schedule</a>
+      <a href="#venue">Venue</a>
+      <a href="#details">Details</a>
+      <a href="#rsvp" class="nav-rsvp-btn">RSVP Now</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-protea-icon">🌾</div>
+    <span class="hero-tag">We Are Getting Married</span>
+    <h1 class="hero-names">Jonathan & Bride</h1>
+    <p class="hero-subtitle">Under the Vast Skies of the South African Highveld</p>
+
+    <div class="hero-date-badge">
+      Saturday, 28 November 2026 • Highveld Country Estate
+    </div>
+
+    <!-- Live Countdown Timer -->
+    <div class="countdown-container">
+      <div class="countdown-box">
+        <div id="cdDays" class="countdown-number">00</div>
+        <div class="countdown-label">Days</div>
+      </div>
+      <div class="countdown-box">
+        <div id="cdHours" class="countdown-number">00</div>
+        <div class="countdown-label">Hours</div>
+      </div>
+      <div class="countdown-box">
+        <div id="cdMins" class="countdown-number">00</div>
+        <div class="countdown-label">Mins</div>
+      </div>
+      <div class="countdown-box">
+        <div id="cdSecs" class="countdown-number">00</div>
+        <div class="countdown-label">Secs</div>
+      </div>
+    </div>
+
+    <a href="#rsvp" class="hero-btn">Kindly Confirm Your Attendance</a>
+  </header>
+
+  <!-- Our Story Section -->
+  <section class="section-wrap">
+    <div class="section-header">
+      <span class="tag">Celebration</span>
+      <h2>Our Story & Love</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="story-card">
+      <p>
+        "Surrounded by golden grasslands, warm sunsets, and the people who mean the world to us,
+        we invite you to witness and celebrate our union. Come share in an unforgettable evening of farm hospitality, laughter, good wine, and dancing into the night."
+      </p>
+    </div>
+  </section>
+
+  <!-- Schedule of the Day -->
+  <section id="schedule" class="section-wrap">
+    <div class="section-header">
+      <span class="tag">The Day's Journey</span>
+      <h2>Order of Events</h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="timeline-time">15:30</span>
+        <h3 class="timeline-title">Welcome Drinks</h3>
+        <p class="timeline-desc">Rooibos iced tea, artisanal craft gin & harvest bites on the lawn.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-time">16:00</span>
+        <h3 class="timeline-title">The Ceremony</h3>
+        <p class="timeline-desc">Vows exchanged under the ancient Acacia trees as the sun begins to soften.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-time">17:00</span>
+        <h3 class="timeline-title">Sunset Canapés</h3>
+        <p class="timeline-desc">Lawn games, live acoustic melodies & golden hour photography.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-time">18:30</span>
+        <h3 class="timeline-title">Farm Feast & Toast</h3>
+        <p class="timeline-desc">Speeches, slow-roasted farm feast & wine in the sandstone barn.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-time">20:30</span>
+        <h3 class="timeline-title">Boma & Dancing</h3>
+        <p class="timeline-desc">Bonfire under the stars, dessert table & celebrations on the dance floor.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Venue & Directions -->
+  <section id="venue" class="section-wrap">
+    <div class="section-header">
+      <span class="tag">The Destination</span>
+      <h2>The Farm Estate</h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="venue-card">
+      <div class="venue-info">
+        <h3>Highveld Country Farm</h3>
+        <p>
+          Nestled in the tranquil rolling hills of the Highveld, just outside the city rush.
+          Enjoy wide open skies, crisp country air, and scenic farm hospitality.
+        </p>
+        <p style="font-size:13px; color:var(--copper-earth); font-weight:600;">
+          📍 Farm R512, Highveld Region, South Africa<br>
+          🅿️ Secure guest parking on-site. Gate security code: #2026
+        </p>
+        <a href="https://maps.google.com" target="_blank" class="btn-map">
+          🗺️ Open in Google Maps
+        </a>
+      </div>
+      <div style="background:#e8dfd3; border-radius:14px; min-height:220px; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; border:1px dashed var(--gold-savannah);">
+        <div>
+          <span style="font-size:40px;">🌄</span>
+          <h4 style="font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--bush-green); margin-top:8px;">Highveld Panorama</h4>
+          <p style="font-size:12px; color:var(--text-muted);">Scenic sunset views overlooking the grasslands</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive RSVP Section -->
+  <section id="rsvp" class="rsvp-section">
+    <div class="section-wrap" style="padding-top:0; padding-bottom:0;">
+      <div class="section-header">
+        <span class="tag" style="color:var(--gold-savannah);">Your Presence</span>
+        <h2>Kindly RSVP</h2>
+        <div class="divider"></div>
+        <p style="color:rgba(255,255,255,0.7); margin-top:12px; font-size:14px;">
+          Please let us know by <strong>15 October 2026</strong> so we can prepare your place at our table.
+        </p>
+      </div>
+
+      <div class="rsvp-card">
+        <form id="rsvpForm" onsubmit="handleRSVPSubmit(event)">
+          <!-- Attendance Switcher -->
+          <div class="attending-toggle">
+            <div class="toggle-option">
+              <input type="radio" id="attendingYes" name="attendance" value="true" checked onchange="toggleGuestFields(true)">
+              <label for="attendingYes" class="toggle-label">
+                <span class="toggle-icon">🥂</span>
+                <span>Joyfully Attending</span>
+              </label>
+            </div>
+            <div class="toggle-option">
+              <input type="radio" id="attendingNo" name="attendance" value="false" onchange="toggleGuestFields(false)">
+              <label for="attendingNo" class="toggle-label">
+                <span class="toggle-icon">💌</span>
+                <span>Regretfully Declining</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="guestName">Your Full Name *</label>
+            <input type="text" id="guestName" class="form-input" placeholder="e.g., Sarah & Michael van der Merwe" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <div class="form-group">
+              <label class="form-label" for="guestPhone">Phone Number</label>
+              <input type="tel" id="guestPhone" class="form-input" placeholder="e.g., 082 123 4567">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="guestEmail">Email Address</label>
+              <input type="email" id="guestEmail" class="form-input" placeholder="e.g., name@example.co.za">
+            </div>
+          </div>
+
+          <!-- Attending Details (Hidden when declining) -->
+          <div id="attendingDetails">
+            <div class="form-group">
+              <label class="form-label" for="guestCount">Total Number of Seats / Guests</label>
+              <select id="guestCount" class="form-select">
+                <option value="1">1 Person (Just Me)</option>
+                <option value="2" selected>2 People (Me + Partner)</option>
+                <option value="3">3 People</option>
+                <option value="4">4 People (Family)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="additionalGuests">Name of Partner / Additional Guests</label>
+              <input type="text" id="additionalGuests" class="form-input" placeholder="e.g., Michael van der Merwe">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="songRequest">Song Request for the Dance Floor 🎵</label>
+              <input type="text" id="songRequest" class="form-input" placeholder="What track will get you dancing?">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="guestMessage">Message or Blessing for the Couple</label>
+            <textarea id="guestMessage" class="form-textarea" placeholder="Leave a sweet note for Jonathan & Bride..."></textarea>
+          </div>
+
+          <button type="submit" id="rsvpBtn" class="submit-rsvp-btn">
+            Send RSVP Confirmation
+          </button>
+        </form>
+
+        <div id="rsvpAlert" class="rsvp-alert">
+          <h3 id="rsvpAlertTitle">✨ Thank You!</h3>
+          <p id="rsvpAlertMsg" style="font-size:14px; color:rgba(255,255,255,0.9);"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Details & FAQs -->
+  <section id="details" class="section-wrap">
+    <div class="section-header">
+      <span class="tag">Guest Information</span>
+      <h2>Important Details</h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-box">
+        <span class="info-icon">👗</span>
+        <h3>Dress Code: Farm Elegance</h3>
+        <p>
+          Semi-formal / Country chic. Lawn-friendly footwear (block heels or wedges) recommended.
+          Please bring a warm jacket or shawl as Highveld evenings become delightfully crisp after sunset.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <span class="info-icon">🏡</span>
+        <h3>Accommodation</h3>
+        <p>
+          There are wonderful guest farms and boutique lodges within 10–15 minutes of the venue.
+          Uber is available, and dedicated local farm shuttle services can be arranged.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <span class="info-icon">🎁</span>
+        <h3>Honeymoon Wishing Well</h3>
+        <p>
+          Your presence at our wedding is the greatest gift of all. Should you wish to honor us with a gift,
+          a contribution toward our honeymoon adventures would be warmly appreciated.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>💍 Jonathan & Bride • South African Highveld Wedding</p>
+    <p style="margin-top:8px;">
+      <a href="/photos">📸 Wedding Day Live Photo Uploader</a> • 
+      <a href="/admin">👑 Couple's Portal</a>
+    </p>
+  </footer>
+
+  <script>
+    // Live Countdown to Saturday 28 November 2026 15:30
+    const targetDate = new Date('2026-11-28T15:30:00+02:00').getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((difference % (1000 * 60)) / 1000);
+
+        document.getElementById('cdDays').innerText = String(days).padStart(2, '0');
+        document.getElementById('cdHours').innerText = String(hours).padStart(2, '0');
+        document.getElementById('cdMins').innerText = String(mins).padStart(2, '0');
+        document.getElementById('cdSecs').innerText = String(secs).padStart(2, '0');
+      }
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    function toggleGuestFields(isAttending) {
+      const details = document.getElementById('attendingDetails');
+      details.style.display = isAttending ? 'block' : 'none';
+    }
+
+    // High Performance RSVP Submission via Go Fiber API
+    async function handleRSVPSubmit(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById('rsvpBtn');
+      const alertBox = document.getElementById('rsvpAlert');
+      const isAttending = document.querySelector('input[name="attendance"]:checked').value === 'true';
+
+      const payload = {
+        name: document.getElementById('guestName').value.trim(),
+        phone: document.getElementById('guestPhone').value.trim(),
+        email: document.getElementById('guestEmail').value.trim(),
+        attending: isAttending,
+        guest_count: isAttending ? parseInt(document.getElementById('guestCount').value, 10) : 0,
+        additional_guests: isAttending ? document.getElementById('additionalGuests').value.trim() : '',
+        song_request: isAttending ? document.getElementById('songRequest').value.trim() : '',
+        message: document.getElementById('guestMessage').value.trim()
+      };
+
+      btn.disabled = true;
+      btn.innerText = 'Sending RSVP...';
+
+      try {
+        const res = await fetch('/api/rsvp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          if (isAttending) {
+            confetti({
+              particleCount: 100,
+              spread: 80,
+              origin: { y: 0.6 },
+              colors: ['#d4a359', '#c87d55', '#243d2c', '#ffffff']
+            });
+          }
+
+          document.getElementById('rsvpForm').style.display = 'none';
+          document.getElementById('rsvpAlertTitle').innerText = isAttending ? '✨ RSVP Confirmed!' : '💌 Thank You For Letting Us Know';
+          document.getElementById('rsvpAlertMsg').innerText = data.message;
+          alertBox.style.display = 'block';
+        } else {
+          alert('Submission failed: ' + (data.error || 'Please check your inputs'));
+          btn.disabled = false;
+          btn.innerText = 'Send RSVP Confirmation';
+        }
+      } catch (err) {
+        alert('Network connection error. Please try again.');
+        btn.disabled = false;
+        btn.innerText = 'Send RSVP Confirmation';
+      }
+    }
+  </script>
+</body>
+</html>

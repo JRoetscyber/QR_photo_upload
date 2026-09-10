@@ -20,6 +20,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/google/uuid"
 	"github.com/valyala/fasthttp"
 )
 
@@ -27,6 +28,7 @@ const (
 	DefaultPort       = ":5167"
 	UploadsDirectory  = "./uploads"
 	DataFile          = "./data/photos.json"
+	DatabaseFile      = "./data/wedding.db"
 	MaxBodyLimitBytes = 150 * 1024 * 1024 // 150MB per batch request
 	MaxDiskWriters    = 64                // Concurrent disk writes semaphore limit
 	DefaultAdminPIN   = "2026"            // Default admin access PIN
@@ -50,11 +52,18 @@ func main() {
 		AdminPIN = envPIN
 	}
 
-	// Initialize thread-safe storage engine
+	// Initialize thread-safe photo storage engine
 	store, err := storage.NewStore(UploadsDirectory, DataFile, MaxDiskWriters)
 	if err != nil {
-		log.Fatalf("Failed to initialize storage: %v", err)
+		log.Fatalf("Failed to initialize photo storage: %v", err)
 	}
+
+	// Initialize thread-safe SQLite database with goroutine worker pools
+	db, err := storage.NewDB(DatabaseFile)
+	if err != nil {
+		log.Fatalf("Failed to initialize SQLite database: %v", err)
+	}
+	defer db.Close()
 
 	// Create Fiber app configured for high-concurrency Fasthttp delivery
 	app := fiber.New(fiber.Config{
@@ -63,7 +72,7 @@ func main() {
 		ReadBufferSize:        16 * 1024,
 		WriteBufferSize:       16 * 1024,
 		ServerHeader:          "WebbingFastServer/1.0",
-		AppName:               "Wedding Moments Fast Photo Server",
+		AppName:               "South African Highveld Wedding Platform",
 		DisableStartupMessage: false,
 	})
 
@@ -84,11 +93,74 @@ func main() {
 		return c.JSON(fiber.Map{
 			"status": "ok",
 			"engine": "fasthttp/fiber",
+			"db":     "sqlite3-wal",
 			"time":   time.Now().Format(time.RFC3339),
 		})
 	})
 
-	// ==================== GUEST APIs ====================
+	// ==================== RSVP APIs (SQLite + Goroutines) ====================
+
+	// API: Submit RSVP
+	app.Post("/api/rsvp", func(c *fiber.Ctx) error {
+		var req struct {
+			Name             string `json:"name"`
+			Email            string `json:"email"`
+			Phone            string `json:"phone"`
+			Attending        bool   `json:"attending"`
+			GuestCount       int    `json:"guest_count"`
+			AdditionalGuests string `json:"additional_guests"`
+			SongRequest      string `json:"song_request"`
+			Message          string `json:"message"`
+		}
+
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid request payload",
+			})
+		}
+
+		req.Name = strings.TrimSpace(req.Name)
+		if req.Name == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Please provide your name",
+			})
+		}
+
+		if req.Attending && req.GuestCount <= 0 {
+			req.GuestCount = 1
+		} else if !req.Attending {
+			req.GuestCount = 0
+		}
+
+		rsvpEntry := storage.RSVP{
+			ID:               uuid.New().String(),
+			Name:             req.Name,
+			Email:            strings.TrimSpace(req.Email),
+			Phone:            strings.TrimSpace(req.Phone),
+			Attending:        req.Attending,
+			GuestCount:       req.GuestCount,
+			AdditionalGuests: strings.TrimSpace(req.AdditionalGuests),
+			SongRequest:      strings.TrimSpace(req.SongRequest),
+			Message:          strings.TrimSpace(req.Message),
+			SubmittedTime:    time.Now(),
+		}
+
+		// Asynchronous ingestion via Go goroutines channel queue
+		db.EnqueueRSVP(rsvpEntry)
+
+		statusMsg := "Thank you! We can't wait to celebrate under the Highveld skies with you!"
+		if !req.Attending {
+			statusMsg = "Thank you for letting us know. You will be dearly missed!"
+		}
+
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"success": true,
+			"id":      rsvpEntry.ID,
+			"message": statusMsg,
+		})
+	})
+
+	// ==================== GUEST PHOTO UPLOAD APIs ====================
 
 	// API: High-Concurrency Photo Upload
 	app.Post("/api/upload", func(c *fiber.Ctx) error {
@@ -210,7 +282,7 @@ func main() {
 		return nil
 	})
 
-	// API: Upload Statistics
+	// API: Photo Upload Statistics
 	app.Get("/api/stats", func(c *fiber.Ctx) error {
 		stats := store.GetStats()
 		return c.JSON(stats)
@@ -263,7 +335,49 @@ func main() {
 		})
 	})
 
-	// Admin: Stream All Photos as ZIP (Instant Album Download)
+	// Admin: Get all RSVPs from SQLite
+	app.Get("/api/admin/rsvps", adminAuth, func(c *fiber.Ctx) error {
+		rsvps, err := db.GetRSVPs()
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+		stats, _ := db.GetRSVPStats()
+		return c.JSON(fiber.Map{
+			"rsvps": rsvps,
+			"stats": stats,
+		})
+	})
+
+	// Admin: Get RSVP Summary Stats
+	app.Get("/api/admin/rsvps/stats", adminAuth, func(c *fiber.Ctx) error {
+		stats, err := db.GetRSVPStats()
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+		return c.JSON(stats)
+	})
+
+	// Admin: Delete RSVP
+	app.Delete("/api/admin/rsvps/:id", adminAuth, func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		if err := db.DeleteRSVP(id); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+		return c.JSON(fiber.Map{"success": true, "message": "RSVP removed"})
+	})
+
+	// Admin: Export RSVPs as CSV
+	app.Get("/api/admin/export-rsvps", adminAuth, func(c *fiber.Ctx) error {
+		csvContent, err := db.ExportRSVPsCSV()
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+		c.Set("Content-Type", "text/csv; charset=utf-8")
+		c.Set("Content-Disposition", `attachment; filename="wedding_guest_rsvps.csv"`)
+		return c.SendString(csvContent)
+	})
+
+	// Admin: Stream All Photos as ZIP
 	app.Get("/api/admin/download-zip", adminAuth, func(c *fiber.Ctx) error {
 		zipFilename := fmt.Sprintf("Wedding_Photos_%s.zip", time.Now().Format("2006-01-02"))
 		c.Set("Content-Type", "application/zip")
@@ -320,7 +434,6 @@ func main() {
 		c.Set("Content-Disposition", `attachment; filename="wedding_guestbook_wishes.csv"`)
 
 		var b strings.Builder
-		// UTF-8 BOM for Microsoft Excel
 		b.WriteString("\xEF\xBB\xBF")
 
 		writer := csv.NewWriter(&b)
@@ -353,7 +466,7 @@ func main() {
 		return c.JSON(fiber.Map{"success": true, "message": "All test photos and metadata cleared!"})
 	})
 
-	// ==================== STATIC ROUTES ====================
+	// ==================== STATIC ROUTES & PAGES ====================
 
 	// Serve Uploaded Files
 	app.Static("/uploads", UploadsDirectory, fiber.Static{
@@ -362,10 +475,20 @@ func main() {
 		MaxAge:    3600,
 	})
 
-	// Serve Static Frontend (Mobile Uploader)
+	// Serve Static Frontend
 	app.Static("/", "./public", fiber.Static{
-		Index:    "index.html",
+		Index:    "invite.html", // Main landing page is the South African Highveld Wedding Invitation
 		Compress: true,
+	})
+
+	// Route for wedding invitation & RSVP
+	app.Get("/invite", func(c *fiber.Ctx) error {
+		return c.SendFile("./public/invite.html")
+	})
+
+	// Route for guest photo uploader portal
+	app.Get("/photos", func(c *fiber.Ctx) error {
+		return c.SendFile("./public/index.html")
 	})
 
 	// Route for live projector wall
@@ -383,9 +506,10 @@ func main() {
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		log.Printf("💍 Wedding Moments Fast Photo Server is running on http://0.0.0.0%s", Port)
-		log.Printf("📸 Mobile Upload Portal: http://localhost%s", Port)
-		log.Printf("👑 Couple's Admin Panel: http://localhost%s/admin (PIN: %s)", Port, AdminPIN)
+		log.Printf("🌾 South African Highveld Wedding Platform is running on http://0.0.0.0%s", Port)
+		log.Printf("💌 Online Wedding Invitation & RSVP: http://localhost%s/invite", Port)
+		log.Printf("📸 Guest Photo Upload Portal: http://localhost%s/photos", Port)
+		log.Printf("👑 Couple's Admin Suite (RSVPs & Photos): http://localhost%s/admin (PIN: %s)", Port, AdminPIN)
 		log.Printf("🎥 Live Projector Wall: http://localhost%s/gallery", Port)
 		if err := app.Listen(Port); err != nil {
 			log.Fatalf("Server listen error: %v", err)
