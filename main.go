@@ -326,7 +326,7 @@ func main() {
 			})
 			return c.JSON(fiber.Map{
 				"success": true,
-				"message": "Welcome, Jonathan & Wife!",
+				"message": "Welcome, Jonathan & Julene!",
 			})
 		}
 
