@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>👑 Couple's Admin Suite | RSVPs & Wedding Memories</title>
+  <title>Couple's Admin Suite | RSVPs & Wedding Memories</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -654,7 +654,7 @@
   <!-- PIN GATE OVERLAY -->
   <div id="pinModal" class="pin-modal">
     <div class="pin-card">
-      <div class="crown-big">👑</div>
+      <div class="crown-big" style="font-family:'Cormorant Garamond',serif; font-size:32px; letter-spacing:4px; color:var(--gold); font-weight:700;">J &amp; J</div>
       <h2>Couple's Suite</h2>
       <p>Enter your 4-digit Wedding PIN to unlock</p>
       <input type="password" id="pinInput" class="pin-input" maxlength="4" placeholder="••••" autofocus>
@@ -667,27 +667,26 @@
     <!-- Navigation Bar -->
     <nav class="nav-bar">
       <div class="brand-group">
-        <span class="brand-crown">👑</span>
         <div class="brand-title">
           <h1>Couple's Wedding Command Center</h1>
           <p>Jonathan & Julene's Private Dashboard • SQLite WAL Engine</p>
         </div>
       </div>
       <div class="nav-actions">
-        <a href="/invite" target="_blank" class="nav-btn">💌 View Invitation</a>
-        <a href="/gallery" target="_blank" class="nav-btn">🎥 Projector Wall</a>
-        <a href="/photos" target="_blank" class="nav-btn">📸 Photos Portal</a>
-        <button class="nav-btn" onclick="lockAdmin()">🔒 Lock</button>
+        <a href="/invite" target="_blank" class="nav-btn">View Invitation</a>
+        <a href="/gallery" target="_blank" class="nav-btn">Projector Wall</a>
+        <a href="/photos" target="_blank" class="nav-btn">Photos Portal</a>
+        <button class="nav-btn" onclick="lockAdmin()">Lock</button>
       </div>
     </nav>
 
     <!-- Top View Switcher -->
     <div class="section-switcher">
       <button id="tabRSVP" class="mode-tab-btn active" onclick="switchView('rsvp')">
-        <span>💌</span> Guest RSVPs & Attendance (SQLite)
+        Guest RSVPs & Attendance (SQLite)
       </button>
       <button id="tabPhotos" class="mode-tab-btn" onclick="switchView('photos')">
-        <span>📸</span> Photo Moderation & Wall
+        Photo Moderation & Wall
       </button>
     </div>
 
@@ -696,28 +695,24 @@
       <!-- KPI Metrics Cards for RSVPs -->
       <section class="metrics-grid">
         <div class="metric-card">
-          <div class="metric-icon">👥</div>
           <div class="metric-data">
             <h3 id="statRSVPAttending">0</h3>
             <p>Confirmed Guest Seats</p>
           </div>
         </div>
         <div class="metric-card">
-          <div class="metric-icon">🥂</div>
           <div class="metric-data">
             <h3 id="statRSVPAttendingCount">0</h3>
             <p>Accepting Responses</p>
           </div>
         </div>
         <div class="metric-card">
-          <div class="metric-icon">💌</div>
           <div class="metric-data">
             <h3 id="statRSVPDeclined">0</h3>
             <p>Regretfully Declining</p>
           </div>
         </div>
         <div class="metric-card">
-          <div class="metric-icon">📊</div>
           <div class="metric-data">
             <h3 id="statRSVPTotal">0</h3>
             <p>Total Responses</p>
@@ -729,7 +724,7 @@
       <section class="action-bar">
         <div class="action-group-left">
           <button class="btn-gold" onclick="exportRSVPsCSV()">
-            <span>📥 Export RSVPs to Excel (.CSV)</span>
+            <span>Export RSVPs to Excel (.CSV)</span>
           </button>
         </div>
         <div>
@@ -739,7 +734,7 @@
 
       <!-- Filter & Search for RSVPs -->
       <section class="filter-bar">
-        <input type="text" id="searchRSVPInput" class="search-input" placeholder="🔍 Search guests, songs, messages..." oninput="applyRSVPFilters()">
+        <input type="text" id="searchRSVPInput" class="search-input" placeholder="Search guests, songs, messages..." oninput="applyRSVPFilters()">
         <div class="filter-tabs">
           <button class="tab-btn active" onclick="setRSVPFilter('all', this)">All</button>
           <button class="tab-btn" onclick="setRSVPFilter('attending', this)">Attending Only</button>
@@ -756,28 +751,24 @@
       <!-- Key Metrics Cards for Photos -->
       <section class="metrics-grid">
         <div class="metric-card">
-          <div class="metric-icon">📸</div>
           <div class="metric-data">
             <h3 id="statTotalPhotos">0</h3>
             <p>Photos Uploaded</p>
           </div>
         </div>
         <div class="metric-card">
-          <div class="metric-icon">👥</div>
           <div class="metric-data">
             <h3 id="statTotalGuests">0</h3>
             <p>Unique Uploaders</p>
           </div>
         </div>
         <div class="metric-card">
-          <div class="metric-icon">⭐️</div>
           <div class="metric-data">
             <h3 id="statFavorites">0</h3>
             <p>Featured Moments</p>
           </div>
         </div>
         <div class="metric-card">
-          <div class="metric-icon">💾</div>
           <div class="metric-data">
             <h3 id="statStorage">0 MB</h3>
             <p>Storage Used</p>
@@ -789,25 +780,25 @@
       <section class="action-bar">
         <div class="action-group-left">
           <button class="btn-gold" id="btnDownloadZip" onclick="downloadAllZip()">
-            <span>📦 Download All as ZIP</span>
+            <span>Download All as ZIP</span>
           </button>
           <button class="btn-outline" onclick="exportGuestbookCSV()">
-            <span>💌 Export Guestbook (.CSV)</span>
+            <span>Export Guestbook (.CSV)</span>
           </button>
         </div>
         <div>
           <button class="btn-danger-outline" onclick="confirmClearAll()">
-            <span>🧹 Reset / Clear Test Photos</span>
+            <span>Reset / Clear Test Photos</span>
           </button>
         </div>
       </section>
 
       <!-- Filter & Search Controls for Photos -->
       <section class="filter-bar">
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search photos by guest name..." oninput="applyFilters()">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search photos by guest name..." oninput="applyFilters()">
         <div class="filter-tabs">
           <button class="tab-btn active" onclick="setFilter('all', this)">All Photos</button>
-          <button class="tab-btn" onclick="setFilter('starred', this)">⭐️ Starred Only</button>
+          <button class="tab-btn" onclick="setFilter('starred', this)">Starred Only</button>
         </div>
       </section>
 
@@ -961,8 +952,8 @@
         const statusText = r.attending ? `Attending (${r.guest_count} Seat${r.guest_count > 1 ? 's' : ''})` : 'Declined';
 
         let contactInfo = [];
-        if (r.phone) contactInfo.push(`📞 ${r.phone}`);
-        if (r.email) contactInfo.push(`✉️ ${r.email}`);
+        if (r.phone) contactInfo.push(`Tel: ${r.phone}`);
+        if (r.email) contactInfo.push(`Email: ${r.email}`);
 
         card.innerHTML = `
           <div class="rsvp-header">
@@ -971,11 +962,11 @@
           </div>
           ${r.additional_guests ? `<div class="rsvp-detail-row"><strong>Guests:</strong> ${escapeHTML(r.additional_guests)}</div>` : ''}
           ${contactInfo.length > 0 ? `<div class="rsvp-detail-row">${contactInfo.join(' • ')}</div>` : ''}
-          ${r.song_request ? `<div class="rsvp-detail-row"><strong>Song:</strong> 🎵 ${escapeHTML(r.song_request)}</div>` : ''}
+          ${r.song_request ? `<div class="rsvp-detail-row"><strong>Song:</strong> ${escapeHTML(r.song_request)}</div>` : ''}
           ${r.message ? `<div class="rsvp-message-box">"${escapeHTML(r.message)}"</div>` : ''}
           <div class="rsvp-actions">
             <span>Submitted: ${new Date(r.submitted_time).toLocaleDateString()}</span>
-            <button class="icon-btn btn-delete" onclick="deleteRSVP('${r.id}')">🗑️ Remove</button>
+            <button class="icon-btn btn-delete" onclick="deleteRSVP('${r.id}')">Remove</button>
           </div>
         `;
         grid.appendChild(card);
@@ -1088,7 +1079,9 @@
 
         const starBtn = document.createElement('div');
         starBtn.className = `star-badge ${photo.favorite ? 'starred' : ''}`;
-        starBtn.innerHTML = photo.favorite ? '★' : '☆';
+        starBtn.innerHTML = photo.favorite 
+          ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#d4af37" stroke="#d4af37" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+          : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
         starBtn.onclick = (e) => {
           e.stopPropagation();
           toggleFavorite(photo.id);
@@ -1101,12 +1094,12 @@
         body.className = 'card-body';
         body.innerHTML = `
           <div class="card-guest">
-            <span>📸 ${escapeHTML(photo.guest_name || 'Guest')}</span>
+            <span>${escapeHTML(photo.guest_name || 'Guest')}</span>
             <span class="card-time">${new Date(photo.upload_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
           </div>
           <div class="card-wish">${photo.wish ? `"${escapeHTML(photo.wish)}"` : '—'}</div>
           <div class="card-actions">
-            <button class="icon-btn btn-delete" onclick="deletePhoto('${photo.id}')">🗑️ Delete</button>
+            <button class="icon-btn btn-delete" onclick="deletePhoto('${photo.id}')">Delete</button>
           </div>
         `;
 

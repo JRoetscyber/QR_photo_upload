@@ -479,7 +479,7 @@
   <div class="container">
     <!-- Header -->
     <header class="header">
-      <div class="rings">💍</div>
+      <div class="rings" style="font-family:'Cormorant Garamond',serif; font-size:24px; letter-spacing:4px; color:var(--gold);">J &amp; J</div>
       <h1>Jonathan & Julene</h1>
       <p>Snap, Share & Celebrate With Us • 11 January 2027</p>
     </header>
@@ -503,13 +503,11 @@
       <!-- Action buttons -->
       <div class="button-row">
         <div class="action-btn" onclick="document.getElementById('cameraInput').click()">
-          <span class="btn-icon">📷</span>
-          <span class="btn-text">Take Photo</span>
+          <span class="btn-text" style="font-size:16px; margin-top:4px;">Take Photo</span>
           <span class="btn-sub">Open Camera</span>
         </div>
         <div class="action-btn" onclick="document.getElementById('galleryInput').click()">
-          <span class="btn-icon">🖼️</span>
-          <span class="btn-text">Choose Photos</span>
+          <span class="btn-text" style="font-size:16px; margin-top:4px;">Choose Photos</span>
           <span class="btn-sub">Pick from Gallery</span>
         </div>
       </div>
@@ -538,7 +536,7 @@
     <!-- Projector / Live Gallery Link -->
     <div class="projector-bar">
       <a href="/gallery" target="_blank" class="projector-link">
-        <span>🎥</span> View Live Projector Slideshow Screen
+        View Live Projector Slideshow Screen
       </a>
     </div>
 
@@ -695,7 +693,7 @@
       uploadBtn.disabled = true;
       progressContainer.style.display = 'block';
       progressBarFill.style.width = '15%';
-      progressText.innerText = '⚡ Turbo-optimizing photos...';
+      progressText.innerText = 'Optimizing photos...';
       alertBox.style.display = 'none';
 
       const uploadStartTime = performance.now();
@@ -704,7 +702,7 @@
       const compressedFiles = await Promise.all(selectedFiles.map(f => compressImage(f)));
 
       progressBarFill.style.width = '35%';
-      progressText.innerText = '🚀 Fast-streaming to server...';
+      progressText.innerText = 'Streaming to server...';
 
       const formData = new FormData();
       formData.append('guest_name', guestName);
@@ -730,9 +728,9 @@
         if (xhr.status === 201 || xhr.status === 200) {
           const res = JSON.parse(xhr.responseText);
           progressBarFill.style.width = '100%';
-          progressText.innerText = `⚡ Uploaded in ${totalDuration}ms!`;
+          progressText.innerText = `Uploaded in ${totalDuration}ms`;
 
-          // Confetti celebration 🎉
+          // Confetti celebration
           confetti({
             particleCount: 90,
             spread: 75,
@@ -740,7 +738,7 @@
             colors: ['#d4af37', '#fdf1cd', '#e74c3c', '#ffffff']
           });
 
-          showAlert(`✨ Thank you ${guestName}! ${res.count} photo(s) saved in ${totalDuration}ms.`, 'success');
+          showAlert(`Thank you ${guestName}! ${res.count} photo(s) saved in ${totalDuration}ms.`, 'success');
 
           // Reset inputs
           selectedFiles = [];
@@ -835,7 +833,7 @@
 
         const name = document.createElement('span');
         name.className = 'guest-tag';
-        name.innerText = photo.guest_name ? `📸 ${photo.guest_name}` : '📸 Guest';
+        name.innerText = photo.guest_name ? photo.guest_name : 'Guest';
 
         info.appendChild(name);
 

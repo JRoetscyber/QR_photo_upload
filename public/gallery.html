@@ -229,13 +229,13 @@
 
   <div class="top-bar">
     <div class="title-group">
-      <h1>💍 Jonathan & Julene's Live Photo Wall</h1>
+      <h1>Jonathan & Julene's Live Photo Wall</h1>
       <p>Real-time guest uploads streaming live • 11 January 2027</p>
     </div>
     <div class="controls">
       <span id="photoCount" class="badge">0 Memories Shared</span>
-      <button class="ctrl-btn" onclick="toggleSlideshow()">▶️ Start Slideshow</button>
-      <button class="ctrl-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <button class="ctrl-btn" onclick="toggleSlideshow()">Start Slideshow</button>
+      <button class="ctrl-btn" onclick="toggleFullscreen()">Fullscreen</button>
     </div>
   </div>
 
@@ -323,7 +323,7 @@
 
         const name = document.createElement('div');
         name.className = 'guest-name';
-        name.innerHTML = `<span>📸 ${photo.guest_name || 'Guest'}</span>`;
+        name.innerHTML = `<span>${photo.guest_name || 'Guest'}</span>`;
 
         info.appendChild(name);
 
@@ -362,7 +362,7 @@
     function showToast(photo) {
       const toast = document.getElementById('toast');
       document.getElementById('toastImg').src = photo.url;
-      document.getElementById('toastTitle').innerText = `✨ ${photo.guest_name || 'A guest'} just uploaded!`;
+      document.getElementById('toastTitle').innerText = `${photo.guest_name || 'A guest'} just uploaded!`;
       document.getElementById('toastWish').innerText = photo.wish ? `"${photo.wish}"` : 'New photo shared to the wall';
 
       toast.classList.add('active');
@@ -390,7 +390,7 @@
       if (photosList.length === 0) return;
       const photo = photosList[slideshowIdx % photosList.length];
       document.getElementById('slideshowImg').src = photo.url;
-      document.getElementById('slideshowGuest').innerText = `📸 Captured by ${photo.guest_name || 'Guest'}`;
+      document.getElementById('slideshowGuest').innerText = `Captured by ${photo.guest_name || 'Guest'}`;
       document.getElementById('slideshowWish').innerText = photo.wish ? `"${photo.wish}"` : '';
       slideshowIdx++;
     }

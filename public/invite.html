@@ -591,7 +591,7 @@
 
   <!-- Hero Section -->
   <header class="hero">
-    <div class="hero-protea-icon">🌾</div>
+    <div class="hero-monogram" style="font-family:'Cormorant Garamond',serif; font-size:32px; letter-spacing:6px; color:var(--gold-savannah); margin-bottom:10px;">J &amp; J</div>
     <span class="hero-tag">We Are Getting Married</span>
     <h1 class="hero-names">Jonathan & Julene</h1>
     <p class="hero-subtitle">Under the Vast Skies of the South African Highveld</p>
@@ -691,16 +691,16 @@
           Enjoy wide open skies, crisp country air, and scenic farm hospitality.
         </p>
         <p style="font-size:13px; color:var(--copper-earth); font-weight:600;">
-          📍 Farm R512, Highveld Region, South Africa<br>
-          🅿️ Secure guest parking on-site. Gate security code: #2026
+          Address: Farm R512, Highveld Region, South Africa<br>
+          Parking: Secure guest parking on-site. Gate security code: #2026
         </p>
         <a href="https://maps.google.com" target="_blank" class="btn-map">
-          🗺️ Open in Google Maps
+          Open in Google Maps
         </a>
       </div>
       <div style="background:#e8dfd3; border-radius:14px; min-height:220px; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; border:1px dashed var(--gold-savannah);">
         <div>
-          <span style="font-size:40px;">🌄</span>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:28px; letter-spacing:3px; color:var(--gold-savannah); font-weight:700; margin-bottom:4px;">ESTATE</div>
           <h4 style="font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--bush-green); margin-top:8px;">Highveld Panorama</h4>
           <p style="font-size:12px; color:var(--text-muted);">Scenic sunset views overlooking the grasslands</p>
         </div>
@@ -727,14 +727,12 @@
             <div class="toggle-option">
               <input type="radio" id="attendingYes" name="attendance" value="true" checked onchange="toggleGuestFields(true)">
               <label for="attendingYes" class="toggle-label">
-                <span class="toggle-icon">🥂</span>
                 <span>Joyfully Attending</span>
               </label>
             </div>
             <div class="toggle-option">
               <input type="radio" id="attendingNo" name="attendance" value="false" onchange="toggleGuestFields(false)">
               <label for="attendingNo" class="toggle-label">
-                <span class="toggle-icon">💌</span>
                 <span>Regretfully Declining</span>
               </label>
             </div>
@@ -774,7 +772,7 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="songRequest">Song Request for the Dance Floor 🎵</label>
+              <label class="form-label" for="songRequest">Song Request for the Dance Floor</label>
               <input type="text" id="songRequest" class="form-input" placeholder="What track will get you dancing?">
             </div>
           </div>
@@ -790,7 +788,7 @@
         </form>
 
         <div id="rsvpAlert" class="rsvp-alert">
-          <h3 id="rsvpAlertTitle">✨ Thank You!</h3>
+          <h3 id="rsvpAlertTitle">Thank You!</h3>
           <p id="rsvpAlertMsg" style="font-size:14px; color:rgba(255,255,255,0.9);"></p>
         </div>
       </div>
@@ -807,7 +805,6 @@
 
     <div class="info-grid">
       <div class="info-box">
-        <span class="info-icon">👗</span>
         <h3>Dress Code: Farm Elegance</h3>
         <p>
           Semi-formal / Country chic. Lawn-friendly footwear (block heels or wedges) recommended.
@@ -816,7 +813,6 @@
       </div>
 
       <div class="info-box">
-        <span class="info-icon">🏡</span>
         <h3>Accommodation</h3>
         <p>
           There are wonderful guest farms and boutique lodges within 10–15 minutes of the venue.
@@ -825,7 +821,6 @@
       </div>
 
       <div class="info-box">
-        <span class="info-icon">🎁</span>
         <h3>Honeymoon Wishing Well</h3>
         <p>
           Your presence at our wedding is the greatest gift of all. Should you wish to honor us with a gift,
@@ -837,10 +832,10 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <p>💍 Jonathan & Julene • South African Highveld Wedding</p>
+    <p>Jonathan & Julene • South African Highveld Wedding</p>
     <p style="margin-top:8px;">
-      <a href="/photos">📸 Wedding Day Live Photo Uploader</a> • 
-      <a href="/admin">👑 Couple's Portal</a>
+      <a href="/photos">Wedding Day Live Photo Uploader</a> • 
+      <a href="/admin">Couple's Portal</a>
     </p>
   </footer>
 
@@ -914,7 +909,7 @@
           }
 
           document.getElementById('rsvpForm').style.display = 'none';
-          document.getElementById('rsvpAlertTitle').innerText = isAttending ? '✨ RSVP Confirmed!' : '💌 Thank You For Letting Us Know';
+          document.getElementById('rsvpAlertTitle').innerText = isAttending ? 'RSVP Confirmed' : 'Thank You For Letting Us Know';
           document.getElementById('rsvpAlertMsg').innerText = data.message;
           alertBox.style.display = 'block';
         } else {
