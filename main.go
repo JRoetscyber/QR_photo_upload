@@ -3,12 +3,12 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"log"
 	"mime/multipart"
 	"os"
 	"os/signal"
-	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -32,17 +32,18 @@ const (
 	DataFile          = "./data/photos.json"
 	DatabaseFile      = "./data/wedding.db"
 	MaxBodyLimitBytes = 150 * 1024 * 1024 // 150MB per batch request
-	MaxDiskWriters    = 128               // High-throughput concurrent disk writes semaphore limit
+	MaxDiskWriters    = 128               // High-throughput concurrent disk writes limit
 	DefaultAdminPIN   = "2026"            // Default admin access PIN
 )
 
 var (
-	Port     = DefaultPort
-	AdminPIN = DefaultAdminPIN
+	Port          = DefaultPort
+	AdminPIN      = DefaultAdminPIN
+	InstanceColor = "blue"
 )
 
 func main() {
-	// Read environment variables if provided (for Docker / Cloudflare deployment)
+	// Read environment variables (for Docker / Blue-Green deployment / Cloudflare)
 	if envPort := os.Getenv("PORT"); envPort != "" {
 		if !strings.HasPrefix(envPort, ":") {
 			Port = ":" + envPort
@@ -52,6 +53,9 @@ func main() {
 	}
 	if envPIN := os.Getenv("ADMIN_PIN"); envPIN != "" {
 		AdminPIN = envPIN
+	}
+	if envColor := os.Getenv("INSTANCE_COLOR"); envColor != "" {
+		InstanceColor = strings.ToLower(envColor)
 	}
 
 	// Initialize thread-safe photo storage engine
@@ -67,6 +71,22 @@ func main() {
 	}
 	defer db.Close()
 
+	// Initialize Redis client for Blue/Green Pub-Sub and distributed caching
+	redisClient := storage.NewRedisClient()
+	defer redisClient.Close()
+
+	// Connect Redis Pub/Sub back to local SSE listeners
+	if redisClient.IsAvailable() {
+		redisClient.SubscribeEvents(func(event string, payload []byte) {
+			if event == "new_photo" {
+				var meta storage.PhotoMetadata
+				if err := json.Unmarshal(payload, &meta); err == nil {
+					store.BroadcastPhoto(&meta)
+				}
+			}
+		})
+	}
+
 	// Create Fiber app configured for F1-grade Fasthttp delivery
 	app := fiber.New(fiber.Config{
 		BodyLimit:             MaxBodyLimitBytes,
@@ -75,12 +95,12 @@ func main() {
 		WriteBufferSize:       8 * 1024,
 		ReduceMemoryUsage:     true,
 		DisableKeepalive:      false,
-		ServerHeader:          "F1-HighveldFastEngine/2.0",
+		ServerHeader:          fmt.Sprintf("F1-HighveldEngine/2.0 (%s)", InstanceColor),
 		AppName:               "Jonathan & Julene Wedding Platform",
 		DisableStartupMessage: false,
 	})
 
-	// Middlewares: Recover -> Compression (Brotli/Gzip) -> ETag -> CORS
+	// Middlewares: Recover -> Compression (Brotli/Gzip) -> ETag -> CORS -> Logger
 	app.Use(recover.New())
 	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestSpeed,
@@ -96,14 +116,17 @@ func main() {
 		TimeFormat: "15:04:05",
 	}))
 
-	// API: Health & Server Status (sub-millisecond)
+	// API: Health & Zero-Downtime Status Check
 	app.Get("/api/health", func(c *fiber.Ctx) error {
 		c.Set("Cache-Control", "no-store")
 		return c.JSON(fiber.Map{
-			"status": "ok",
-			"engine": "fasthttp/fiber-f1",
-			"db":     "sqlite3-wal-mmap",
-			"time":   time.Now().Format(time.RFC3339),
+			"status":   "ok",
+			"color":    InstanceColor,
+			"port":     Port,
+			"redis":    redisClient.IsAvailable(),
+			"engine":   "fasthttp/fiber-f1",
+			"db":       "sqlite3-wal-mmap",
+			"time":     time.Now().Format(time.RFC3339),
 		})
 	})
 
@@ -151,15 +174,17 @@ func main() {
 			AdditionalGuests: strings.TrimSpace(req.AdditionalGuests),
 			SongRequest:      strings.TrimSpace(req.SongRequest),
 			Message:          strings.TrimSpace(req.Message),
+			HasUploaded:      false,
+			UploadCount:      0,
 			SubmittedTime:    time.Now(),
 		}
 
-		// Asynchronous ingestion via Go goroutines channel queue
+		// Asynchronous ingestion via Go goroutines worker pool
 		db.EnqueueRSVP(rsvpEntry)
 
-		statusMsg := "Thank you! We can't wait to celebrate under the Highveld skies with you!"
+		statusMsg := "Baie dankie! Ons kan nie wag om saam met julle by Die Oog fees te vier nie!"
 		if !req.Attending {
-			statusMsg = "Thank you for letting us know. You will be dearly missed!"
+			statusMsg = "Baie dankie dat jy laat weet het. Ons gaan jou mis!"
 		}
 
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -171,7 +196,7 @@ func main() {
 
 	// ==================== GUEST PHOTO UPLOAD APIs ====================
 
-	// API: High-Concurrency Photo Upload
+	// API: High-Concurrency Photo Upload with Automatic Guest Tracking & Redis Pub/Sub
 	app.Post("/api/upload", func(c *fiber.Ctx) error {
 		form, err := c.MultipartForm()
 		if err != nil {
@@ -195,14 +220,14 @@ func main() {
 
 		guestName := ""
 		if names, ok := form.Value["guest_name"]; ok && len(names) > 0 {
-			guestName = names[0]
+			guestName = strings.TrimSpace(names[0])
 		}
 		wish := ""
 		if wishes, ok := form.Value["wish"]; ok && len(wishes) > 0 {
-			wish = wishes[0]
+			wish = strings.TrimSpace(wishes[0])
 		}
 
-		// Process uploads in parallel goroutines for maximum throughput
+		// Process uploads concurrently with worker semaphore
 		type uploadResult struct {
 			meta *storage.PhotoMetadata
 			err  error
@@ -229,6 +254,10 @@ func main() {
 				errors = append(errors, res.err.Error())
 			} else if res.meta != nil {
 				savedPhotos = append(savedPhotos, res.meta)
+				// Broadcast cross-instance via Redis
+				if redisClient.IsAvailable() {
+					_ = redisClient.PublishEvent("new_photo", res.meta)
+				}
 			}
 		}
 
@@ -239,12 +268,17 @@ func main() {
 			})
 		}
 
+		// SMART EXCLUSION ENGINE: Mark guest as uploaded so they are automatically excluded from reminders!
+		if len(savedPhotos) > 0 && guestName != "" {
+			go db.RecordGuestUpload(guestName)
+		}
+
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"success": true,
 			"count":   len(savedPhotos),
 			"photos":  savedPhotos,
 			"errors":  errors,
-			"message": fmt.Sprintf("Successfully saved %d photo(s). Thank you %s!", len(savedPhotos), guestName),
+			"message": fmt.Sprintf("Suksesvol %d foto(s) gestoor. Baie dankie %s!", len(savedPhotos), guestName),
 		})
 	})
 
@@ -297,6 +331,39 @@ func main() {
 		stats := store.GetStats()
 		c.Set("Cache-Control", "public, max-age=3")
 		return c.JSON(stats)
+	})
+
+	// ==================== NOTIFICATION & PWA APIs ====================
+
+	// API: Subscribe for Web Push Notifications
+	app.Post("/api/notifications/subscribe", func(c *fiber.Ctx) error {
+		var req struct {
+			Endpoint  string `json:"endpoint"`
+			P256dh    string `json:"p256dh"`
+			Auth      string `json:"auth"`
+			GuestName string `json:"guest_name"`
+		}
+		if err := c.BodyParser(&req); err != nil || req.Endpoint == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid push subscription"})
+		}
+
+		sub := storage.PushSubscription{
+			ID:        uuid.New().String(),
+			Endpoint:  req.Endpoint,
+			P256dh:    req.P256dh,
+			Auth:      req.Auth,
+			GuestName: strings.TrimSpace(req.GuestName),
+			CreatedAt: time.Now(),
+		}
+
+		if err := db.SavePushSubscription(sub); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"success": true,
+			"message": "Push notifications activated successfully!",
+		})
 	})
 
 	// ==================== ADMIN APIs ====================
@@ -388,9 +455,110 @@ func main() {
 		return c.SendString(csvContent)
 	})
 
+	// Admin: Broadcast Live Update / Announcement to All Guests
+	app.Post("/api/admin/broadcast-update", adminAuth, func(c *fiber.Ctx) error {
+		var req struct {
+			Title   string `json:"title"`
+			Message string `json:"message"`
+		}
+		if err := c.BodyParser(&req); err != nil || req.Message == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Message is required"})
+		}
+		if req.Title == "" {
+			req.Title = "Wedding Announcement • Jonathan & Julene"
+		}
+
+		subs, _ := db.GetPushSubscriptions()
+		sentCount := len(subs)
+
+		// Broadcast cross-instance via Redis Pub/Sub
+		if redisClient.IsAvailable() {
+			_ = redisClient.PublishEvent("announcement", map[string]string{
+				"title":   req.Title,
+				"message": req.Message,
+			})
+		}
+
+		// Log notification dispatch in SQLite
+		_ = db.RecordNotificationLog(storage.NotificationLog{
+			ID:           uuid.New().String(),
+			Title:        req.Title,
+			Message:      req.Message,
+			Type:         "broadcast",
+			SentCount:    sentCount,
+			SkippedCount: 0,
+			SentAt:       time.Now(),
+		})
+
+		return c.JSON(fiber.Map{
+			"success":    true,
+			"sent_count": sentCount,
+			"message":    fmt.Sprintf("Broadcast sent to %d subscribers!", sentCount),
+		})
+	})
+
+	// Admin: SMART POST-WEDDING PHOTO REMINDER (Skips guests who already uploaded!)
+	app.Post("/api/admin/send-upload-reminders", adminAuth, func(c *fiber.Ctx) error {
+		// 1. Find all attending guests who haven't uploaded yet
+		unuploadedGuests, err := db.GetUnuploadedAttendingGuests()
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+
+		// 2. Get stats on who already uploaded
+		stats, _ := db.GetRSVPStats()
+		skippedCount := stats.UploadedCount
+		targetCount := len(unuploadedGuests)
+
+		// 3. Mark guests reminded in SQLite
+		remindedIDs := make([]string, len(unuploadedGuests))
+		for i, g := range unuploadedGuests {
+			remindedIDs[i] = g.ID
+		}
+		_ = db.MarkGuestsReminded(remindedIDs)
+
+		title := "Onthou asseblief om jou troufoto's op te laai!"
+		message := "Jonathan & Julene nooi jou uit om al jou mooi fotos en herinneringe van die troue by Die Oog op die gasteportaal te deel!"
+
+		// 4. Log in SQLite notification history
+		_ = db.RecordNotificationLog(storage.NotificationLog{
+			ID:           uuid.New().String(),
+			Title:        title,
+			Message:      message,
+			Type:         "photo_reminder",
+			SentCount:    targetCount,
+			SkippedCount: skippedCount,
+			SentAt:       time.Now(),
+		})
+
+		return c.JSON(fiber.Map{
+			"success":                  true,
+			"sent_count":               targetCount,
+			"skipped_already_uploaded": skippedCount,
+			"unuploaded_guests":        unuploadedGuests,
+			"message":                  fmt.Sprintf("Herinnering gestuur aan %d gaste. %d gaste is outomaties oorgeslaan omdat hulle reeds foto's opgelaai het!", targetCount, skippedCount),
+		})
+	})
+
+	// Admin: Get Notification History & Stats
+	app.Get("/api/admin/notifications/history", adminAuth, func(c *fiber.Ctx) error {
+		logs, err := db.GetNotificationLogs()
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+		subs, _ := db.GetPushSubscriptions()
+		stats, _ := db.GetRSVPStats()
+
+		return c.JSON(fiber.Map{
+			"history":          logs,
+			"subscriber_count": len(subs),
+			"stats":            stats,
+		})
+	})
+
 	// Admin: Stream All Photos as ZIP
 	app.Get("/api/admin/download-zip", adminAuth, func(c *fiber.Ctx) error {
-		zipFilename := fmt.Sprintf("Wedding_Photos_%s.zip", time.Now().Format("2006-01-02"))
+		zipFilename := fmt.Sprintf("Die_Oog_Troufoto's_%s.zip", time.Now().Format("2006-01-02"))
 		c.Set("Content-Type", "application/zip")
 		c.Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, zipFilename))
 
@@ -500,45 +668,43 @@ func main() {
 		return c.SendFile("./public/invite.html")
 	})
 
-	// Route for guest photo uploader portal
+	// Route for guest photo upload portal
 	app.Get("/photos", func(c *fiber.Ctx) error {
 		c.Set("Cache-Control", "public, max-age=3600")
 		return c.SendFile("./public/index.html")
 	})
 
-	// Route for live projector wall
-	app.Get("/gallery", func(c *fiber.Ctx) error {
-		c.Set("Cache-Control", "public, max-age=3600")
-		return c.SendFile("./public/gallery.html")
-	})
-
-	// Route for couple's admin panel
+	// Route for couple's admin command center
 	app.Get("/admin", func(c *fiber.Ctx) error {
-		c.Set("Cache-Control", "no-cache")
+		c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
 		return c.SendFile("./public/admin.html")
 	})
 
-	// Graceful Shutdown Setup
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	// Route for live projector screen
+	app.Get("/gallery", func(c *fiber.Ctx) error {
+		c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		return c.SendFile("./public/gallery.html")
+	})
+
+	// Graceful shutdown handling
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		log.Printf("🏎️  F1-Tuned Wedding Engine is running on http://0.0.0.0%s", Port)
-		log.Printf("💌 Online Wedding Invitation & RSVP: http://localhost%s/invite", Port)
-		log.Printf("📸 Guest Photo Upload Portal: http://localhost%s/photos", Port)
-		log.Printf("👑 Couple's Admin Suite (RSVPs & Photos): http://localhost%s/admin (PIN: %s)", Port, AdminPIN)
-		log.Printf("🎥 Live Projector Wall: http://localhost%s/gallery", Port)
-		if err := app.Listen(Port); err != nil {
-			log.Fatalf("Server listen error: %v", err)
-		}
+		<-sigChan
+		log.Println("[Shutdown] Gracefully terminating server...")
+		_ = app.Shutdown()
 	}()
 
-	<-stop
-	log.Println("Shutting down wedding server gracefully...")
-	_ = app.Shutdown()
-	log.Println("Server stopped.")
-}
+	log.Printf("==================================================")
+	log.Printf(" 🏎️  JONATHAN & JULENE WEDDING PLATFORM (%s)", strings.ToUpper(InstanceColor))
+	log.Printf(" 🚀 F1 Fasthttp Server running on port %s", Port)
+	log.Printf(" 📂 Uploads directory: %s", UploadsDirectory)
+	log.Printf(" 🗄️  SQLite WAL Database: %s", DatabaseFile)
+	log.Printf(" ⚡ Redis Pub/Sub: %t", redisClient.IsAvailable())
+	log.Printf("==================================================")
 
-func init() {
-	_ = strconv.Itoa(0)
+	if err := app.Listen(Port); err != nil {
+		log.Printf("Server stopped: %v", err)
+	}
 }

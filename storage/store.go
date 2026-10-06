@@ -119,6 +119,13 @@ func (s *Store) broadcast(photo PhotoMetadata) {
 	}
 }
 
+// BroadcastPhoto broadcasts a photo metadata struct to all local SSE subscribers
+func (s *Store) BroadcastPhoto(photo *PhotoMetadata) {
+	if photo != nil {
+		s.broadcast(*photo)
+	}
+}
+
 // SaveUploadedFile streams a multipart file header to disk with concurrency control and records metadata.
 func (s *Store) SaveUploadedFile(fileHeader *multipart.FileHeader, guestName, wish string) (*PhotoMetadata, error) {
 	// Acquire disk write semaphore

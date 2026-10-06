@@ -683,7 +683,7 @@
       });
     }
 
-    // High Concurrency Turbo Upload
+    // Cloudflare-Safe Chunked Turbo Upload Pipeline
     async function handleUpload() {
       if (selectedFiles.length === 0) return;
 
@@ -692,76 +692,85 @@
 
       uploadBtn.disabled = true;
       progressContainer.style.display = 'block';
-      progressBarFill.style.width = '15%';
-      progressText.innerText = 'Optimizing photos...';
+      progressBarFill.style.width = '10%';
+      progressText.innerText = 'Optimizing photos for fast upload...';
       alertBox.style.display = 'none';
 
       const uploadStartTime = performance.now();
 
-      // Parallel client-side compression
+      // Parallel client-side compression (resizes 15MB 4K photos down to ~350KB)
       const compressedFiles = await Promise.all(selectedFiles.map(f => compressImage(f)));
 
-      progressBarFill.style.width = '35%';
-      progressText.innerText = 'Streaming to server...';
+      const totalFiles = compressedFiles.length;
+      let uploadedCount = 0;
+      let uploadErrors = [];
 
-      const formData = new FormData();
-      formData.append('guest_name', guestName);
-      formData.append('wish', wish);
+      // Cloudflare Protection: Upload photos individually so each payload is only ~350KB
+      for (let i = 0; i < totalFiles; i++) {
+        const file = compressedFiles[i];
+        progressText.innerText = `Uploading photo ${i + 1} of ${totalFiles}...`;
 
-      compressedFiles.forEach(file => {
+        const formData = new FormData();
+        formData.append('guest_name', guestName);
+        formData.append('wish', (i === 0) ? wish : ''); // Attach wish to first photo
         formData.append('photos', file, file.name);
-      });
 
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/upload', true);
-
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const percent = 35 + Math.round((e.loaded / e.total) * 65);
-          progressBarFill.style.width = percent + '%';
-          progressText.innerText = `Streaming... ${percent}%`;
-        }
-      };
-
-      xhr.onload = () => {
-        const totalDuration = Math.round(performance.now() - uploadStartTime);
-        if (xhr.status === 201 || xhr.status === 200) {
-          const res = JSON.parse(xhr.responseText);
-          progressBarFill.style.width = '100%';
-          progressText.innerText = `Uploaded in ${totalDuration}ms`;
-
-          // Confetti celebration
-          confetti({
-            particleCount: 90,
-            spread: 75,
-            origin: { y: 0.6 },
-            colors: ['#d4af37', '#fdf1cd', '#e74c3c', '#ffffff']
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
           });
 
-          showAlert(`Thank you ${guestName}! ${res.count} photo(s) saved in ${totalDuration}ms.`, 'success');
-
-          // Reset inputs
-          selectedFiles = [];
-          guestWishInput.value = '';
-          renderPreviews();
-          setTimeout(() => {
-            progressContainer.style.display = 'none';
-            progressBarFill.style.width = '0%';
-          }, 2500);
-
-          fetchRecentPhotos();
-        } else {
-          showAlert('Upload failed. Please try again.', 'error');
-          uploadBtn.disabled = false;
+          if (res.ok) {
+            uploadedCount++;
+          } else {
+            uploadErrors.push(`Photo ${i + 1} failed`);
+          }
+        } catch (err) {
+          uploadErrors.push(`Photo ${i + 1} network error`);
         }
-      };
 
-      xhr.onerror = () => {
-        showAlert('Network error. Check Wi-Fi connection.', 'error');
+        const currentPercent = 10 + Math.round(((i + 1) / totalFiles) * 90);
+        progressBarFill.style.width = currentPercent + '%';
+      }
+
+      const totalDuration = Math.round(performance.now() - uploadStartTime);
+
+      if (uploadedCount > 0) {
+        progressBarFill.style.width = '100%';
+        progressText.innerText = `Uploaded in ${totalDuration}ms`;
+
+        // Confetti celebration
+        confetti({
+          particleCount: 90,
+          spread: 75,
+          origin: { y: 0.6 },
+          colors: ['#d4af37', '#fdf1cd', '#e74c3c', '#ffffff']
+        });
+
+        showAlert(`Baie dankie ${guestName}! ${uploadedCount} foto(s) suksesvol gestoor in ${totalDuration}ms.`, 'success');
+
+        // Reset inputs
+        selectedFiles = [];
+        guestWishInput.value = '';
+        renderPreviews();
+        setTimeout(() => {
+          progressContainer.style.display = 'none';
+          progressBarFill.style.width = '0%';
+        }, 2500);
+
+        fetchRecentPhotos();
+      } else {
+        showAlert('Upload failed. Please check your connection and try again.', 'error');
         uploadBtn.disabled = false;
-      };
+      }
+    }
 
-      xhr.send(formData);
+    // Register Service Worker for Push Notifications
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
     }
 
     function showAlert(message, type) {

@@ -688,6 +688,9 @@
       <button id="tabPhotos" class="mode-tab-btn" onclick="switchView('photos')">
         Photo Moderation & Wall
       </button>
+      <button id="tabNotifs" class="mode-tab-btn" onclick="switchView('notifs')">
+        Notifications & Photo Reminders
+      </button>
     </div>
 
     <!-- ================= VIEW 1: RSVP MANAGEMENT ================= -->
@@ -805,6 +808,74 @@
       <!-- Photos Grid -->
       <section id="photoGrid" class="photo-grid"></section>
     </div>
+
+    <!-- ================= VIEW 3: NOTIFICATIONS & REMINDERS ================= -->
+    <div id="viewNotifs" style="display: none;">
+      <!-- Key Metrics for Notifications -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-data">
+            <h3 id="statSubscribers">0</h3>
+            <p>Active Push Subscribers</p>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-data">
+            <h3 id="statUploadedGuests" style="color:#27ae60;">0</h3>
+            <p>Guests With Uploads</p>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-data">
+            <h3 id="statPendingUploads" style="color:#e67e22;">0</h3>
+            <p>Guests Pending Upload</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Action Panels Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 30px;">
+        
+        <!-- Post-Wedding Smart Photo Reminder Card -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow);">
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; margin-bottom: 8px; color: var(--gold);">Smart Post-Wedding Photo Reminder</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.6;">
+            <strong>Outomatiese Slim-Filter:</strong> Stuur slegs 'n herinnering aan gaste wat die troue bygewoon het en <em>NOG NIE</em> foto's opgelaai het nie. Gaste wat reeds foto's gedeel het word outomaties oorgeslaan!
+          </p>
+          <div style="background: rgba(212,175,55,0.08); border-left: 3px solid var(--gold); padding: 12px 14px; border-radius: 6px; margin-bottom: 20px; font-size: 13px;">
+            Teikengroep: <strong id="pendingTargetCount">0</strong> gaste sonder foto's
+          </div>
+          <button class="btn-gold" id="btnSendReminder" onclick="sendUploadReminders()" style="width: 100%;">
+            <span>Stuur Na-Troue Foto Herinnering</span>
+          </button>
+        </div>
+
+        <!-- Live Broadcast Announcement Card -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow);">
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; margin-bottom: 8px; color: var(--gold);">Broadcast Announcement</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            Stuur 'n onmiddellike kennisgewing na alle intekenaars se fone en rekenaars.
+          </p>
+          <div style="margin-bottom: 12px;">
+            <input type="text" id="broadcastTitle" class="form-input" style="width: 100%; background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: white;" placeholder="Opskrif (bv. Seremonie begin oor 15 minute!)">
+          </div>
+          <div style="margin-bottom: 16px;">
+            <textarea id="broadcastMessage" class="form-textarea" style="width: 100%; height: 70px; background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: white;" placeholder="Boodskap inhoud..."></textarea>
+          </div>
+          <button class="btn-outline" id="btnBroadcast" onclick="sendBroadcast()" style="width: 100%;">
+            <span>Stuur Kennisgewing</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Notification History Table -->
+      <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);">
+        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 16px;">Notification Dispatch History</h3>
+        <div id="notifHistoryContainer" style="overflow-x: auto;">
+          <p style="color: var(--text-muted); font-size: 13px;">Loading notification logs...</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Lightbox Modal -->
@@ -880,12 +951,18 @@
       currentActiveView = view;
       document.getElementById('tabRSVP').className = `mode-tab-btn ${view === 'rsvp' ? 'active' : ''}`;
       document.getElementById('tabPhotos').className = `mode-tab-btn ${view === 'photos' ? 'active' : ''}`;
+      document.getElementById('tabNotifs').className = `mode-tab-btn ${view === 'notifs' ? 'active' : ''}`;
       document.getElementById('viewRSVP').style.display = view === 'rsvp' ? 'block' : 'none';
       document.getElementById('viewPhotos').style.display = view === 'photos' ? 'block' : 'none';
+      document.getElementById('viewNotifs').style.display = view === 'notifs' ? 'block' : 'none';
+
+      if (view === 'notifs') {
+        fetchNotificationData();
+      }
     }
 
     async function loadDashboard() {
-      await Promise.all([fetchRSVPs(), fetchPhotos(), fetchPhotoStats()]);
+      await Promise.all([fetchRSVPs(), fetchPhotos(), fetchPhotoStats(), fetchNotificationData()]);
     }
 
     // ================= RSVP FUNCTIONS =================
@@ -1167,6 +1244,125 @@
 
     function closeLightbox() {
       document.getElementById('lightboxModal').style.display = 'none';
+    }
+
+    // ================= NOTIFICATION & REMINDER FUNCTIONS =================
+    async function fetchNotificationData() {
+      try {
+        const res = await fetch('/api/admin/notifications/history', {
+          headers: { 'X-Admin-PIN': currentAdminPIN }
+        });
+        const data = await res.json();
+        const stats = data.stats || {};
+        const history = data.history || [];
+
+        document.getElementById('statSubscribers').innerText = data.subscriber_count || 0;
+        document.getElementById('statUploadedGuests').innerText = stats.uploaded_count || 0;
+        document.getElementById('statPendingUploads').innerText = stats.pending_uploads || 0;
+        document.getElementById('pendingTargetCount').innerText = stats.pending_uploads || 0;
+
+        renderNotificationHistory(history);
+      } catch (err) {
+        console.error('Failed to load notification stats:', err);
+      }
+    }
+
+    function renderNotificationHistory(history) {
+      const container = document.getElementById('notifHistoryContainer');
+      if (history.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">No notifications dispatched yet.</p>';
+        return;
+      }
+
+      let html = `
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border); color: var(--gold);">
+              <th style="padding: 10px 8px;">Date/Time</th>
+              <th style="padding: 10px 8px;">Type</th>
+              <th style="padding: 10px 8px;">Title</th>
+              <th style="padding: 10px 8px;">Sent</th>
+              <th style="padding: 10px 8px;">Skipped (Already Uploaded)</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      history.forEach(h => {
+        const typeBadge = h.type === 'photo_reminder' 
+          ? '<span style="background: rgba(230,126,34,0.2); color: #e67e22; padding: 3px 8px; border-radius: 12px; font-size: 11px;">Photo Reminder</span>'
+          : '<span style="background: rgba(52,152,219,0.2); color: #3498db; padding: 3px 8px; border-radius: 12px; font-size: 11px;">Broadcast</span>';
+
+        html += `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td style="padding: 10px 8px; color: var(--text-muted);">${new Date(h.sent_at).toLocaleString()}</td>
+            <td style="padding: 10px 8px;">${typeBadge}</td>
+            <td style="padding: 10px 8px; font-weight: 500;">${escapeHTML(h.title)}</td>
+            <td style="padding: 10px 8px; color: #27ae60; font-weight: 600;">${h.sent_count}</td>
+            <td style="padding: 10px 8px; color: var(--text-muted);">${h.skipped_count}</td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    async function sendUploadReminders() {
+      const btn = document.getElementById('btnSendReminder');
+      if (!confirm('Stuur na-troue foto herinnering aan alle gaste wat nog nie foto\'s opgelaai het nie?')) return;
+
+      btn.disabled = true;
+      btn.innerText = 'Besig om te stuur...';
+
+      try {
+        const res = await fetch('/api/admin/send-upload-reminders', {
+          method: 'POST',
+          headers: { 'X-Admin-PIN': currentAdminPIN }
+        });
+        const data = await res.json();
+        alert(data.message || 'Herinneringe suksesvol gestuur!');
+        fetchNotificationData();
+      } catch (err) {
+        alert('Kon nie herinneringe stuur nie.');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Stuur Na-Troue Foto Herinnering';
+      }
+    }
+
+    async function sendBroadcast() {
+      const title = document.getElementById('broadcastTitle').value.trim();
+      const message = document.getElementById('broadcastMessage').value.trim();
+      const btn = document.getElementById('btnBroadcast');
+
+      if (!message) {
+        alert('Voer asseblief \'n boodskap in.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Besig om te stuur...';
+
+      try {
+        const res = await fetch('/api/admin/broadcast-update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-PIN': currentAdminPIN
+          },
+          body: JSON.stringify({ title, message })
+        });
+        const data = await res.json();
+        alert(data.message || 'Kennisgewing uitgestuur!');
+        document.getElementById('broadcastMessage').value = '';
+        fetchNotificationData();
+      } catch (err) {
+        alert('Kon nie kennisgewing stuur nie.');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Stuur Kennisgewing';
+      }
     }
 
     function escapeHTML(str) {

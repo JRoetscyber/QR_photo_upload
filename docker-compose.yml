@@ -1,26 +1,116 @@
-version: '3.8'
-
 services:
-  wedding_server:
-    build: .
-    container_name: wedding_server
+  # ==========================================
+  # 1. DISTRIBUTED REDIS 7 PUB/SUB & CACHE
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: wedding_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - wedding_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ==========================================
+  # 2. BLUE APPLICATION INSTANCE
+  # ==========================================
+  app_blue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wedding_app_blue
     restart: unless-stopped
     environment:
       - PORT=5167
+      - INSTANCE_COLOR=blue
+      - REDIS_ADDR=redis:6379
       - ADMIN_PIN=2026
     volumes:
-      # Persistent storage on host machine
-      - ./uploads:/app/uploads
-      - ./data:/app/data
+      - wedding_uploads:/app/uploads
+      - wedding_data:/app/data
     networks:
-      # Attach to your Cloudflare Tunnel docker network
-      - cloudflare_tunnel_net
+      - wedding_net
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:5167/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ==========================================
+  # 3. GREEN APPLICATION INSTANCE
+  # ==========================================
+  app_green:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wedding_app_green
+    restart: unless-stopped
+    environment:
+      - PORT=5168
+      - INSTANCE_COLOR=green
+      - REDIS_ADDR=redis:6379
+      - ADMIN_PIN=2026
+    volumes:
+      - wedding_uploads:/app/uploads
+      - wedding_data:/app/data
+    networks:
+      - wedding_net
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:5168/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ==========================================
+  # 4. NGINX ZERO-DOWNTIME REVERSE PROXY
+  # ==========================================
+  nginx:
+    image: nginx:alpine
+    container_name: wedding_nginx
+    restart: unless-stopped
     ports:
-      # Optional: also expose locally on host if needed
-      - "5167:5167"
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/upstream.conf:/etc/nginx/conf.d/upstream.conf:rw
+    networks:
+      - wedding_net
+    depends_on:
+      - app_blue
+      - app_green
+
+  # ==========================================
+  # 5. CLOUDFLARE TUNNEL (Exposes Nginx)
+  # ==========================================
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: wedding_tunnel
+    restart: unless-stopped
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN:-}
+    command: tunnel run
+    networks:
+      - wedding_net
+    depends_on:
+      - nginx
 
 networks:
-  cloudflare_tunnel_net:
-    # If your existing cloudflared container is already on an existing Docker network:
-    name: cloudflare_tunnel_net
-    external: false
+  wedding_net:
+    driver: bridge
+
+volumes:
+  redis_data:
+  wedding_uploads:
+  wedding_data:
