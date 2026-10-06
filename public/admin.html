@@ -840,13 +840,13 @@
         <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow);">
           <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; margin-bottom: 8px; color: var(--gold);">Smart Post-Wedding Photo Reminder</h2>
           <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.6;">
-            <strong>Outomatiese Slim-Filter:</strong> Stuur slegs 'n herinnering aan gaste wat die troue bygewoon het en <em>NOG NIE</em> foto's opgelaai het nie. Gaste wat reeds foto's gedeel het word outomaties oorgeslaan!
+            <strong>Automated Smart Filter:</strong> Only sends reminders to guests who attended the wedding and have <em>NOT YET</em> uploaded photos. Guests who have already uploaded are automatically skipped!
           </p>
           <div style="background: rgba(212,175,55,0.08); border-left: 3px solid var(--gold); padding: 12px 14px; border-radius: 6px; margin-bottom: 20px; font-size: 13px;">
-            Teikengroep: <strong id="pendingTargetCount">0</strong> gaste sonder foto's
+            Target Audience: <strong id="pendingTargetCount">0</strong> guests pending photos
           </div>
           <button class="btn-gold" id="btnSendReminder" onclick="sendUploadReminders()" style="width: 100%;">
-            <span>Stuur Na-Troue Foto Herinnering</span>
+            <span>Send Post-Wedding Photo Reminders</span>
           </button>
         </div>
 
@@ -854,16 +854,16 @@
         <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow);">
           <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; margin-bottom: 8px; color: var(--gold);">Broadcast Announcement</h2>
           <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
-            Stuur 'n onmiddellike kennisgewing na alle intekenaars se fone en rekenaars.
+            Send an instant push notification to all subscribers' phones and browsers.
           </p>
           <div style="margin-bottom: 12px;">
-            <input type="text" id="broadcastTitle" class="form-input" style="width: 100%; background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: white;" placeholder="Opskrif (bv. Seremonie begin oor 15 minute!)">
+            <input type="text" id="broadcastTitle" class="form-input" style="width: 100%; background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: white;" placeholder="Title (e.g. Ceremony begins in 15 minutes!)">
           </div>
           <div style="margin-bottom: 16px;">
-            <textarea id="broadcastMessage" class="form-textarea" style="width: 100%; height: 70px; background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: white;" placeholder="Boodskap inhoud..."></textarea>
+            <textarea id="broadcastMessage" class="form-textarea" style="width: 100%; height: 70px; background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: white;" placeholder="Message content..."></textarea>
           </div>
           <button class="btn-outline" id="btnBroadcast" onclick="sendBroadcast()" style="width: 100%;">
-            <span>Stuur Kennisgewing</span>
+            <span>Send Notification</span>
           </button>
         </div>
       </div>
@@ -1310,10 +1310,10 @@
 
     async function sendUploadReminders() {
       const btn = document.getElementById('btnSendReminder');
-      if (!confirm('Stuur na-troue foto herinnering aan alle gaste wat nog nie foto\'s opgelaai het nie?')) return;
+      if (!confirm('Send post-wedding photo reminders to all guests who have not uploaded photos yet?')) return;
 
       btn.disabled = true;
-      btn.innerText = 'Besig om te stuur...';
+      btn.innerText = 'Sending reminders...';
 
       try {
         const res = await fetch('/api/admin/send-upload-reminders', {
@@ -1321,13 +1321,13 @@
           headers: { 'X-Admin-PIN': currentAdminPIN }
         });
         const data = await res.json();
-        alert(data.message || 'Herinneringe suksesvol gestuur!');
+        alert(data.message || 'Reminders successfully sent!');
         fetchNotificationData();
       } catch (err) {
-        alert('Kon nie herinneringe stuur nie.');
+        alert('Could not send reminders.');
       } finally {
         btn.disabled = false;
-        btn.innerText = 'Stuur Na-Troue Foto Herinnering';
+        btn.innerText = 'Send Post-Wedding Photo Reminders';
       }
     }
 
@@ -1337,12 +1337,12 @@
       const btn = document.getElementById('btnBroadcast');
 
       if (!message) {
-        alert('Voer asseblief \'n boodskap in.');
+        alert('Please enter a message.');
         return;
       }
 
       btn.disabled = true;
-      btn.innerText = 'Besig om te stuur...';
+      btn.innerText = 'Sending announcement...';
 
       try {
         const res = await fetch('/api/admin/broadcast-update', {
@@ -1354,14 +1354,14 @@
           body: JSON.stringify({ title, message })
         });
         const data = await res.json();
-        alert(data.message || 'Kennisgewing uitgestuur!');
+        alert(data.message || 'Notification broadcast sent!');
         document.getElementById('broadcastMessage').value = '';
         fetchNotificationData();
       } catch (err) {
-        alert('Kon nie kennisgewing stuur nie.');
+        alert('Could not send notification.');
       } finally {
         btn.disabled = false;
-        btn.innerText = 'Stuur Kennisgewing';
+        btn.innerText = 'Send Notification';
       }
     }
 

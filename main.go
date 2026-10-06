@@ -182,9 +182,9 @@ func main() {
 		// Asynchronous ingestion via Go goroutines worker pool
 		db.EnqueueRSVP(rsvpEntry)
 
-		statusMsg := "Baie dankie! Ons kan nie wag om saam met julle by Die Oog fees te vier nie!"
+		statusMsg := "Thank you so much! We can't wait to celebrate with you under the Bushveld skies at Die Oog!"
 		if !req.Attending {
-			statusMsg = "Baie dankie dat jy laat weet het. Ons gaan jou mis!"
+			statusMsg = "Thank you for letting us know. You will be dearly missed!"
 		}
 
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -278,7 +278,7 @@ func main() {
 			"count":   len(savedPhotos),
 			"photos":  savedPhotos,
 			"errors":  errors,
-			"message": fmt.Sprintf("Suksesvol %d foto(s) gestoor. Baie dankie %s!", len(savedPhotos), guestName),
+			"message": fmt.Sprintf("Successfully saved %d photo(s). Thank you so much %s!", len(savedPhotos), guestName),
 		})
 	})
 
@@ -517,8 +517,8 @@ func main() {
 		}
 		_ = db.MarkGuestsReminded(remindedIDs)
 
-		title := "Onthou asseblief om jou troufoto's op te laai!"
-		message := "Jonathan & Julene nooi jou uit om al jou mooi fotos en herinneringe van die troue by Die Oog op die gasteportaal te deel!"
+		title := "Please remember to upload your wedding photos!"
+		message := "Jonathan & Julene invite you to share all your photos and memories from our wedding at Die Oog on the guest portal!"
 
 		// 4. Log in SQLite notification history
 		_ = db.RecordNotificationLog(storage.NotificationLog{
@@ -536,7 +536,7 @@ func main() {
 			"sent_count":               targetCount,
 			"skipped_already_uploaded": skippedCount,
 			"unuploaded_guests":        unuploadedGuests,
-			"message":                  fmt.Sprintf("Herinnering gestuur aan %d gaste. %d gaste is outomaties oorgeslaan omdat hulle reeds foto's opgelaai het!", targetCount, skippedCount),
+			"message":                  fmt.Sprintf("Reminders sent to %d guests. %d guests automatically skipped because they already uploaded photos!", targetCount, skippedCount),
 		})
 	})
 
@@ -558,7 +558,7 @@ func main() {
 
 	// Admin: Stream All Photos as ZIP
 	app.Get("/api/admin/download-zip", adminAuth, func(c *fiber.Ctx) error {
-		zipFilename := fmt.Sprintf("Die_Oog_Troufoto's_%s.zip", time.Now().Format("2006-01-02"))
+		zipFilename := fmt.Sprintf("Die_Oog_Wedding_Photos_%s.zip", time.Now().Format("2006-01-02"))
 		c.Set("Content-Type", "application/zip")
 		c.Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, zipFilename))
 
@@ -697,11 +697,11 @@ func main() {
 	}()
 
 	log.Printf("==================================================")
-	log.Printf(" 🏎️  JONATHAN & JULENE WEDDING PLATFORM (%s)", strings.ToUpper(InstanceColor))
-	log.Printf(" 🚀 F1 Fasthttp Server running on port %s", Port)
-	log.Printf(" 📂 Uploads directory: %s", UploadsDirectory)
-	log.Printf(" 🗄️  SQLite WAL Database: %s", DatabaseFile)
-	log.Printf(" ⚡ Redis Pub/Sub: %t", redisClient.IsAvailable())
+	log.Printf("  JONATHAN & JULENE WEDDING PLATFORM (%s)", strings.ToUpper(InstanceColor))
+	log.Printf("  F1 Fasthttp Server running on port %s", Port)
+	log.Printf("  Uploads directory: %s", UploadsDirectory)
+	log.Printf("  SQLite WAL Database: %s", DatabaseFile)
+	log.Printf("  Redis Pub/Sub: %t", redisClient.IsAvailable())
 	log.Printf("==================================================")
 
 	if err := app.Listen(Port); err != nil {
