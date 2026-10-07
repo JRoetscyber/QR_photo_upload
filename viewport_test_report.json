@@ -1,0 +1,418 @@
+[
+  {
+    "name": "72\" TV 4K raw",
+    "viewport": "3840x2160 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 3840,
+      "innerW": 3840,
+      "clientW": 3840,
+      "hasHOverflow": false,
+      "heroH": 1771,
+      "navW": 3840,
+      "storyW": 1280
+    },
+    "screenshot": "3840x2160@1.png"
+  },
+  {
+    "name": "72\" TV scaled",
+    "viewport": "1920x1080 @2.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1920,
+      "innerW": 1920,
+      "clientW": 1920,
+      "hasHOverflow": false,
+      "heroH": 950,
+      "navW": 1920,
+      "storyW": 860
+    },
+    "screenshot": "1920x1080@2.png"
+  },
+  {
+    "name": "43\" 4K monitor",
+    "viewport": "3840x2160 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 3840,
+      "innerW": 3840,
+      "clientW": 3840,
+      "hasHOverflow": false,
+      "heroH": 1771,
+      "navW": 3840,
+      "storyW": 1280
+    },
+    "screenshot": "3840x2160@1_monitor.png"
+  },
+  {
+    "name": "Ultrawide 34\"",
+    "viewport": "3440x1440 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 3440,
+      "innerW": 3440,
+      "clientW": 3440,
+      "hasHOverflow": false,
+      "heroH": 1224,
+      "navW": 3440,
+      "storyW": 1100
+    },
+    "screenshot": "3440x1440@1.png"
+  },
+  {
+    "name": "32\" 4K scaled",
+    "viewport": "2560x1440 @1.5",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 2560,
+      "innerW": 2560,
+      "clientW": 2560,
+      "hasHOverflow": false,
+      "heroH": 1224,
+      "navW": 2560,
+      "storyW": 980
+    },
+    "screenshot": "2560x1440@1.5.png"
+  },
+  {
+    "name": "27\" QHD",
+    "viewport": "2560x1440 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 2560,
+      "innerW": 2560,
+      "clientW": 2560,
+      "hasHOverflow": false,
+      "heroH": 1224,
+      "navW": 2560,
+      "storyW": 980
+    },
+    "screenshot": "2560x1440@1.png"
+  },
+  {
+    "name": "iMac 27\" 5K",
+    "viewport": "2560x1440 @2.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 2560,
+      "innerW": 2560,
+      "clientW": 2560,
+      "hasHOverflow": false,
+      "heroH": 1224,
+      "navW": 2560,
+      "storyW": 980
+    },
+    "screenshot": "2560x1440@2.png"
+  },
+  {
+    "name": "iMac 24\"",
+    "viewport": "2240x1260 @2.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 2240,
+      "innerW": 2240,
+      "clientW": 2240,
+      "hasHOverflow": false,
+      "heroH": 1109,
+      "navW": 2240,
+      "storyW": 920
+    },
+    "screenshot": "2240x1260@2.png"
+  },
+  {
+    "name": "24\" Full HD",
+    "viewport": "1920x1080 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1920,
+      "innerW": 1920,
+      "clientW": 1920,
+      "hasHOverflow": false,
+      "heroH": 950,
+      "navW": 1920,
+      "storyW": 860
+    },
+    "screenshot": "1920x1080@1.png"
+  },
+  {
+    "name": "MacBook Pro 16\"",
+    "viewport": "1728x1117 @2.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1728,
+      "innerW": 1728,
+      "clientW": 1728,
+      "hasHOverflow": false,
+      "heroH": 983,
+      "navW": 1728,
+      "storyW": 820
+    },
+    "screenshot": "1728x1117@2.png"
+  },
+  {
+    "name": "MacBook Air 15\"",
+    "viewport": "1710x1107 @2.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1710,
+      "innerW": 1710,
+      "clientW": 1710,
+      "hasHOverflow": false,
+      "heroH": 996,
+      "navW": 1710,
+      "storyW": 760
+    },
+    "screenshot": "1710x1107@2.png"
+  },
+  {
+    "name": "Windows laptop 15\" (125%)",
+    "viewport": "1536x864 @1.25",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1536,
+      "innerW": 1536,
+      "clientW": 1536,
+      "hasHOverflow": false,
+      "heroH": 786,
+      "navW": 1536,
+      "storyW": 760
+    },
+    "screenshot": "1536x864@1.25.png"
+  },
+  {
+    "name": "MacBook Pro 14\"",
+    "viewport": "1512x982 @2.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1512,
+      "innerW": 1512,
+      "clientW": 1512,
+      "hasHOverflow": false,
+      "heroH": 884,
+      "navW": 1512,
+      "storyW": 760
+    },
+    "screenshot": "1512x982@2.png"
+  },
+  {
+    "name": "MacBook Air 13\" M2/M3",
+    "viewport": "1470x956 @2.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1470,
+      "innerW": 1470,
+      "clientW": 1470,
+      "hasHOverflow": false,
+      "heroH": 860,
+      "navW": 1470,
+      "storyW": 760
+    },
+    "screenshot": "1470x956@2.png"
+  },
+  {
+    "name": "MacBook Air 13\" older",
+    "viewport": "1440x900 @2.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1440,
+      "innerW": 1440,
+      "clientW": 1440,
+      "hasHOverflow": false,
+      "heroH": 810,
+      "navW": 1440,
+      "storyW": 760
+    },
+    "screenshot": "1440x900@2.png"
+  },
+  {
+    "name": "Small laptop 14\"",
+    "viewport": "1366x768 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1366,
+      "innerW": 1366,
+      "clientW": 1366,
+      "hasHOverflow": false,
+      "heroH": 780,
+      "navW": 1366,
+      "storyW": 720
+    },
+    "screenshot": "1366x768@1.png"
+  },
+  {
+    "name": "Small laptop 13\"",
+    "viewport": "1280x800 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1280,
+      "innerW": 1280,
+      "clientW": 1280,
+      "hasHOverflow": false,
+      "heroH": 772,
+      "navW": 1280,
+      "storyW": 720
+    },
+    "screenshot": "1280x800@1.png"
+  },
+  {
+    "name": "Netbook",
+    "viewport": "1280x720 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1280,
+      "innerW": 1280,
+      "clientW": 1280,
+      "hasHOverflow": false,
+      "heroH": 772,
+      "navW": 1280,
+      "storyW": 720
+    },
+    "screenshot": "1280x720@1.png"
+  },
+  {
+    "name": "Minimum desktop",
+    "viewport": "1024x768 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1024,
+      "innerW": 1024,
+      "clientW": 1024,
+      "hasHOverflow": false,
+      "heroH": 720,
+      "navW": 1024,
+      "storyW": 680
+    },
+    "screenshot": "1024x768@1.png"
+  },
+  {
+    "name": "In-between 1100",
+    "viewport": "1100x750 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1100,
+      "innerW": 1100,
+      "clientW": 1100,
+      "hasHOverflow": false,
+      "heroH": 734,
+      "navW": 1100,
+      "storyW": 680
+    },
+    "screenshot": "1100x750@1.png"
+  },
+  {
+    "name": "In-between 1200",
+    "viewport": "1200x800 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1200,
+      "innerW": 1200,
+      "clientW": 1200,
+      "hasHOverflow": false,
+      "heroH": 751,
+      "navW": 1200,
+      "storyW": 680
+    },
+    "screenshot": "1200x800@1.png"
+  },
+  {
+    "name": "In-between 1400",
+    "viewport": "1400x900 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1400,
+      "innerW": 1400,
+      "clientW": 1400,
+      "hasHOverflow": false,
+      "heroH": 810,
+      "navW": 1400,
+      "storyW": 720
+    },
+    "screenshot": "1400x900@1.png"
+  },
+  {
+    "name": "In-between 1600",
+    "viewport": "1600x900 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1600,
+      "innerW": 1600,
+      "clientW": 1600,
+      "hasHOverflow": false,
+      "heroH": 810,
+      "navW": 1600,
+      "storyW": 760
+    },
+    "screenshot": "1600x900@1.png"
+  },
+  {
+    "name": "In-between 1800",
+    "viewport": "1800x1000 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 1800,
+      "innerW": 1800,
+      "clientW": 1800,
+      "hasHOverflow": false,
+      "heroH": 880,
+      "navW": 1800,
+      "storyW": 820
+    },
+    "screenshot": "1800x1000@1.png"
+  },
+  {
+    "name": "In-between 2000",
+    "viewport": "2000x1100 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 2000,
+      "innerW": 2000,
+      "clientW": 2000,
+      "hasHOverflow": false,
+      "heroH": 968,
+      "navW": 2000,
+      "storyW": 860
+    },
+    "screenshot": "2000x1100@1.png"
+  },
+  {
+    "name": "In-between 3000",
+    "viewport": "3000x1300 @1.0",
+    "status": "PASS",
+    "notes": "Clean fluid layout, zero overflow, crisp scaling",
+    "metrics": {
+      "scrollW": 3000,
+      "innerW": 3000,
+      "clientW": 3000,
+      "hasHOverflow": false,
+      "heroH": 1105,
+      "navW": 3000,
+      "storyW": 980
+    },
+    "screenshot": "3000x1300@1.png"
+  }
+]
