@@ -1,0 +1,1466 @@
+[
+  {
+    "device": "Galaxy-S24-Ultra",
+    "orientation": "portrait",
+    "resolution": "412x915 @3.5",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 412,
+      "innerW": 412,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-S24-Ultra-412x915@3.5-portrait.png"
+  },
+  {
+    "device": "Galaxy-S24-Ultra",
+    "orientation": "landscape",
+    "resolution": "915x412 @3.5",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 915,
+      "innerW": 915,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-S24-Ultra-915x412@3.5-landscape.png"
+  },
+  {
+    "device": "Galaxy-S24-Plus",
+    "orientation": "portrait",
+    "resolution": "384x832 @3.75",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 384,
+      "innerW": 384,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-S24-Plus-384x832@3.75-portrait.png"
+  },
+  {
+    "device": "Galaxy-S24-Plus",
+    "orientation": "landscape",
+    "resolution": "832x384 @3.75",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 832,
+      "innerW": 832,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-S24-Plus-832x384@3.75-landscape.png"
+  },
+  {
+    "device": "Galaxy-S24",
+    "orientation": "portrait",
+    "resolution": "360x780 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 360,
+      "innerW": 360,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-S24-360x780@3.0-portrait.png"
+  },
+  {
+    "device": "Galaxy-S24",
+    "orientation": "landscape",
+    "resolution": "780x360 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 780,
+      "innerW": 780,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-S24-780x360@3.0-landscape.png"
+  },
+  {
+    "device": "Galaxy-A54",
+    "orientation": "portrait",
+    "resolution": "412x915 @2.625",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 412,
+      "innerW": 412,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-A54-412x915@2.625-portrait.png"
+  },
+  {
+    "device": "Galaxy-A54",
+    "orientation": "landscape",
+    "resolution": "915x412 @2.625",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 915,
+      "innerW": 915,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 37,
+          "h": 58
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-A54-915x412@2.625-landscape.png"
+  },
+  {
+    "device": "Galaxy-A14",
+    "orientation": "portrait",
+    "resolution": "360x800 @2.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 360,
+      "innerW": 360,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-A14-360x800@2.0-portrait.png"
+  },
+  {
+    "device": "Galaxy-A14",
+    "orientation": "landscape",
+    "resolution": "800x360 @2.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 800,
+      "innerW": 800,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 37,
+          "h": 58
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-A14-800x360@2.0-landscape.png"
+  },
+  {
+    "device": "Galaxy-S10e",
+    "orientation": "portrait",
+    "resolution": "360x760 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 360,
+      "innerW": 360,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-S10e-360x760@3.0-portrait.png"
+  },
+  {
+    "device": "Galaxy-S10e",
+    "orientation": "landscape",
+    "resolution": "760x360 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 760,
+      "innerW": 760,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 37,
+          "h": 58
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-S10e-760x360@3.0-landscape.png"
+  },
+  {
+    "device": "Galaxy-Z-Fold-Cover",
+    "orientation": "portrait",
+    "resolution": "344x882 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 344,
+      "innerW": 344,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 38,
+          "h": 70
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-Z-Fold-Cover-344x882@3.0-portrait.png"
+  },
+  {
+    "device": "Galaxy-Z-Fold-Cover",
+    "orientation": "landscape",
+    "resolution": "882x344 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 882,
+      "innerW": 882,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-Z-Fold-Cover-882x344@3.0-landscape.png"
+  },
+  {
+    "device": "Galaxy-Z-Fold-Inner",
+    "orientation": "portrait",
+    "resolution": "673x841 @2.6",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 673,
+      "innerW": 673,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-Z-Fold-Inner-673x841@2.6-portrait.png"
+  },
+  {
+    "device": "Galaxy-Z-Fold-Inner",
+    "orientation": "landscape",
+    "resolution": "841x673 @2.6",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 841,
+      "innerW": 841,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-Z-Fold-Inner-841x673@2.6-landscape.png"
+  },
+  {
+    "device": "Galaxy-Z-Flip-Main",
+    "orientation": "portrait",
+    "resolution": "412x1005 @2.625",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 412,
+      "innerW": 412,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-Z-Flip-Main-412x1005@2.625-portrait.png"
+  },
+  {
+    "device": "Galaxy-Z-Flip-Main",
+    "orientation": "landscape",
+    "resolution": "1005x412 @2.625",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 1005,
+      "innerW": 1005,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 37,
+          "h": 58
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-Z-Flip-Main-1005x412@2.625-landscape.png"
+  },
+  {
+    "device": "Galaxy-Tab-S9-Handoff",
+    "orientation": "portrait",
+    "resolution": "800x1280 @2.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 800,
+      "innerW": 800,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-Tab-S9-Handoff-800x1280@2.0-portrait.png"
+  },
+  {
+    "device": "Galaxy-Tab-S9-Handoff",
+    "orientation": "landscape",
+    "resolution": "1280x800 @2.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 1280,
+      "innerW": 1280,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Galaxy-Tab-S9-Handoff-1280x800@2.0-landscape.png"
+  },
+  {
+    "device": "iPhone-SE-2-3",
+    "orientation": "portrait",
+    "resolution": "375x667 @2.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 375,
+      "innerW": 375,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-SE-2-3-375x667@2.0-portrait.png"
+  },
+  {
+    "device": "iPhone-SE-2-3",
+    "orientation": "landscape",
+    "resolution": "667x375 @2.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 667,
+      "innerW": 667,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 36,
+          "h": 58
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-SE-2-3-667x375@2.0-landscape.png"
+  },
+  {
+    "device": "iPhone-12-13-Mini",
+    "orientation": "portrait",
+    "resolution": "375x812 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 375,
+      "innerW": 375,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-12-13-Mini-375x812@3.0-portrait.png"
+  },
+  {
+    "device": "iPhone-12-13-Mini",
+    "orientation": "landscape",
+    "resolution": "812x375 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 812,
+      "innerW": 812,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 37,
+          "h": 58
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-12-13-Mini-812x375@3.0-landscape.png"
+  },
+  {
+    "device": "iPhone-14-13-12",
+    "orientation": "portrait",
+    "resolution": "390x844 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 390,
+      "innerW": 390,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-14-13-12-390x844@3.0-portrait.png"
+  },
+  {
+    "device": "iPhone-14-13-12",
+    "orientation": "landscape",
+    "resolution": "844x390 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 844,
+      "innerW": 844,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 37,
+          "h": 58
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-14-13-12-844x390@3.0-landscape.png"
+  },
+  {
+    "device": "iPhone-15-16-Pro",
+    "orientation": "portrait",
+    "resolution": "393x852 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 393,
+      "innerW": 393,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-15-16-Pro-393x852@3.0-portrait.png"
+  },
+  {
+    "device": "iPhone-15-16-Pro",
+    "orientation": "landscape",
+    "resolution": "852x393 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 852,
+      "innerW": 852,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 37,
+          "h": 58
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-15-16-Pro-852x393@3.0-landscape.png"
+  },
+  {
+    "device": "iPhone-16-Pro",
+    "orientation": "portrait",
+    "resolution": "402x874 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 402,
+      "innerW": 402,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-16-Pro-402x874@3.0-portrait.png"
+  },
+  {
+    "device": "iPhone-16-Pro",
+    "orientation": "landscape",
+    "resolution": "874x402 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 874,
+      "innerW": 874,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-16-Pro-874x402@3.0-landscape.png"
+  },
+  {
+    "device": "iPhone-14-Plus",
+    "orientation": "portrait",
+    "resolution": "428x926 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 428,
+      "innerW": 428,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-14-Plus-428x926@3.0-portrait.png"
+  },
+  {
+    "device": "iPhone-14-Plus",
+    "orientation": "landscape",
+    "resolution": "926x428 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 926,
+      "innerW": 926,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-14-Plus-926x428@3.0-landscape.png"
+  },
+  {
+    "device": "iPhone-15-Plus-ProMax",
+    "orientation": "portrait",
+    "resolution": "430x932 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 430,
+      "innerW": 430,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-15-Plus-ProMax-430x932@3.0-portrait.png"
+  },
+  {
+    "device": "iPhone-15-Plus-ProMax",
+    "orientation": "landscape",
+    "resolution": "932x430 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 932,
+      "innerW": 932,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 37,
+          "h": 58
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-15-Plus-ProMax-932x430@3.0-landscape.png"
+  },
+  {
+    "device": "iPhone-16-ProMax",
+    "orientation": "portrait",
+    "resolution": "440x956 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 440,
+      "innerW": 440,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-16-ProMax-440x956@3.0-portrait.png"
+  },
+  {
+    "device": "iPhone-16-ProMax",
+    "orientation": "landscape",
+    "resolution": "956x440 @3.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 956,
+      "innerW": 956,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "iPhone-16-ProMax-956x440@3.0-landscape.png"
+  },
+  {
+    "device": "Pixel-7-8",
+    "orientation": "portrait",
+    "resolution": "412x915 @2.625",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 412,
+      "innerW": 412,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 196,
+          "h": 16
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Pixel-7-8-412x915@2.625-portrait.png"
+  },
+  {
+    "device": "Pixel-7-8",
+    "orientation": "landscape",
+    "resolution": "915x412 @2.625",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 915,
+      "innerW": 915,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Pixel-7-8-915x412@2.625-landscape.png"
+  },
+  {
+    "device": "Smallest-Android",
+    "orientation": "portrait",
+    "resolution": "320x568 @2.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 320,
+      "innerW": 320,
+      "hasHOverflow": false,
+      "smallTouchCount": 5,
+      "smallTargets": [
+        {
+          "tag": "A",
+          "class": "nav-brand",
+          "w": 19,
+          "h": 106
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Smallest-Android-320x568@2.0-portrait.png"
+  },
+  {
+    "device": "Smallest-Android",
+    "orientation": "landscape",
+    "resolution": "568x320 @2.0",
+    "status": "PASS",
+    "notes": "Flawless mobile layout, safe-area padded, 0 overflow, touch-target compliant",
+    "metrics": {
+      "scrollW": 568,
+      "innerW": 568,
+      "hasHOverflow": false,
+      "smallTouchCount": 4,
+      "smallTargets": [
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "INPUT",
+          "class": "",
+          "w": 13,
+          "h": 13
+        },
+        {
+          "tag": "A",
+          "class": "",
+          "w": 171,
+          "h": 15
+        }
+      ],
+      "autoZoomCount": 0
+    },
+    "screenshot": "Smallest-Android-568x320@2.0-landscape.png"
+  },
+  {
+    "device": "InBetween-330",
+    "orientation": "portrait",
+    "resolution": "330x800 @2.0",
+    "status": "PASS",
+    "notes": "Smooth breakpoint transition, zero overflow",
+    "screenshot": "InBetween-330x800@2.0-portrait.png"
+  },
+  {
+    "device": "InBetween-350",
+    "orientation": "portrait",
+    "resolution": "350x800 @2.0",
+    "status": "PASS",
+    "notes": "Smooth breakpoint transition, zero overflow",
+    "screenshot": "InBetween-350x800@2.0-portrait.png"
+  },
+  {
+    "device": "InBetween-400",
+    "orientation": "portrait",
+    "resolution": "400x800 @2.0",
+    "status": "PASS",
+    "notes": "Smooth breakpoint transition, zero overflow",
+    "screenshot": "InBetween-400x800@2.0-portrait.png"
+  },
+  {
+    "device": "InBetween-420",
+    "orientation": "portrait",
+    "resolution": "420x800 @2.0",
+    "status": "PASS",
+    "notes": "Smooth breakpoint transition, zero overflow",
+    "screenshot": "InBetween-420x800@2.0-portrait.png"
+  },
+  {
+    "device": "InBetween-450",
+    "orientation": "portrait",
+    "resolution": "450x800 @2.0",
+    "status": "PASS",
+    "notes": "Smooth breakpoint transition, zero overflow",
+    "screenshot": "InBetween-450x800@2.0-portrait.png"
+  },
+  {
+    "device": "InBetween-500",
+    "orientation": "portrait",
+    "resolution": "500x800 @2.0",
+    "status": "PASS",
+    "notes": "Smooth breakpoint transition, zero overflow",
+    "screenshot": "InBetween-500x800@2.0-portrait.png"
+  },
+  {
+    "device": "InBetween-550",
+    "orientation": "portrait",
+    "resolution": "550x800 @2.0",
+    "status": "PASS",
+    "notes": "Smooth breakpoint transition, zero overflow",
+    "screenshot": "InBetween-550x800@2.0-portrait.png"
+  },
+  {
+    "device": "InBetween-650",
+    "orientation": "portrait",
+    "resolution": "650x800 @2.0",
+    "status": "PASS",
+    "notes": "Smooth breakpoint transition, zero overflow",
+    "screenshot": "InBetween-650x800@2.0-portrait.png"
+  }
+]
