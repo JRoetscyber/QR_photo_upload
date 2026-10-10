@@ -319,6 +319,46 @@
       color: var(--text-muted);
     }
 
+    /* Venue photo with dark gradient for text legibility */
+    .venue-photo {
+      position: relative;
+      min-height: 240px;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      text-align: center;
+      padding: clamp(14px, 4vw, 22px);
+      background:
+        linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.2) 100%),
+        url(/die_oog.jpeg) center/cover no-repeat #3a2f25;
+    }
+    .venue-photo-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(22px, 7vw, 28px);
+      letter-spacing: 3px;
+      color: #f3e2a9;
+      font-weight: 700;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .venue-photo-text h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(17px, 5.2vw, 22px);
+      color: #fff;
+      margin-top: 6px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .venue-photo-text p {
+      font-size: clamp(11px, 3.2vw, 12.5px);
+      color: rgba(255,255,255,0.85);
+      margin-top: 2px;
+    }
+    @media (max-width: 767px) {
+      .venue-card { display: flex !important; flex-direction: column !important; align-items: stretch !important; }
+      .venue-card .venue-photo { order: -1 !important; min-height: clamp(220px, 62vw, 320px); width: 100%; }
+    }
+
     /* Venue & Map Card */
     .venue-card {
       background: var(--sandstone-card);
@@ -582,13 +622,54 @@
   <!-- Responsive Mobile & Universal Desktop Stylesheets -->
   <link rel="stylesheet" href="/responsive-mobile.css">
   <link rel="stylesheet" href="/responsive.css">
+  <style>
+    /* Burger menu (phones) */
+    .nav-burger { display: none; }
+    @media (max-width: 767px) {
+      .nav-header .nav-burger {
+        display: inline-flex; flex-direction: column; justify-content: center; align-items: center;
+        gap: 5px; width: 44px; height: 44px; padding: 0; margin-right: -8px;
+        background: transparent; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      }
+      .nav-burger span {
+        display: block; width: 24px; height: 2.5px; border-radius: 2px;
+        background: var(--bush-green); transition: transform .25s ease, opacity .2s ease;
+      }
+      .nav-header.open .nav-burger span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+      .nav-header.open .nav-burger span:nth-child(2) { opacity: 0; }
+      .nav-header.open .nav-burger span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+      .nav-header .nav-links {
+        position: absolute; top: 100%; left: 0; right: 0;
+        flex-direction: column; align-items: stretch; gap: 0;
+        background: rgba(249, 245, 239, 0.98);
+        -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(212, 163, 89, 0.3);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+        padding: 8px max(16px, env(safe-area-inset-left)) 16px;
+        max-height: 0; overflow: hidden; opacity: 0; visibility: hidden;
+        transition: max-height .3s ease, opacity .2s ease, visibility .3s;
+      }
+      .nav-header.open .nav-links { max-height: 80vh; opacity: 1; visibility: visible; }
+      .nav-header .nav-links a {
+        font-size: 16px; padding: 14px 8px; min-height: 48px;
+        border-bottom: 1px solid rgba(0,0,0,0.06); justify-content: flex-start;
+      }
+      .nav-header .nav-links .nav-rsvp-btn {
+        margin-top: 12px; justify-content: center; border-bottom: 0;
+        font-size: 16px !important; padding: 14px 18px !important; text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <!-- Floating Navigation -->
   <nav class="nav-header">
     <a href="#" class="nav-brand">J & J</a>
-    <div class="nav-links">
+    <button type="button" class="nav-burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="navLinks">
       <a href="#schedule">Schedule</a>
       <a href="#venue">Venue</a>
       <a href="#details">Details</a>
@@ -703,11 +784,11 @@
           Open in Google Maps
         </a>
       </div>
-      <div style="background:url(/die_oog.jpeg) center/cover no-repeat #e8dfd3; border-radius:14px; min-height:220px; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; border:1px dashed var(--gold-savannah);">
-        <div>
-          <div style="font-family:'Cormorant Garamond',serif; font-size:28px; letter-spacing:3px; color:var(--gold-savannah); font-weight:700; margin-bottom:4px;">DIE OOG</div>
-          <h4 style="font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--bush-green); margin-top:8px;">Bushveld Reserve & Koppie</h4>
-          <p style="font-size:12px; color:var(--text-muted);">Natural Bushveld Haven in Mookgophong</p>
+      <div class="venue-photo">
+        <div class="venue-photo-text">
+          <div class="venue-photo-title">DIE OOG</div>
+          <h4>Bushveld Reserve &amp; Koppie</h4>
+          <p>Natural Bushveld Haven in Mookgophong</p>
         </div>
       </div>
     </div>
@@ -844,6 +925,23 @@
   </footer>
 
   <script>
+    // Burger menu: toggle, close on link tap / outside tap / Escape / resize to desktop
+    (function () {
+      const nav = document.querySelector('.nav-header');
+      const burger = document.getElementById('navBurger');
+      if (!nav || !burger) return;
+      const setOpen = (open) => {
+        nav.classList.toggle('open', open);
+        burger.setAttribute('aria-expanded', String(open));
+        burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      };
+      burger.addEventListener('click', (e) => { e.stopPropagation(); setOpen(!nav.classList.contains('open')); });
+      nav.querySelectorAll('.nav-links a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+      document.addEventListener('click', (e) => { if (!nav.contains(e.target)) setOpen(false); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+      window.addEventListener('resize', () => { if (window.innerWidth > 767) setOpen(false); });
+    })();
+
     // Live Countdown to Monday 11 January 2027 15:30
     const targetDate = new Date('2027-01-11T15:30:00+02:00').getTime();
 
