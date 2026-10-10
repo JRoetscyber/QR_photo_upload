@@ -441,14 +441,14 @@ canvas {
 }
 
 .form-label {
-  font-size: 12px;
+  font-size: clamp(10px, 3.1vw, 12px);
   margin-bottom: 5px;
 }
 
 .form-input,
 .form-select,
 .form-textarea {
-  font-size: 16px !important; /* Prevents mobile browser auto-zoom */
+  font-size: clamp(13px, 3.8vw, 16px) !important; /* shrinks with viewport */
   padding: 13px 14px;
   border-radius: var(--mob-radius-sm);
   min-height: 48px;

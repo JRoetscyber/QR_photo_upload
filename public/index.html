@@ -109,7 +109,7 @@
 
     .form-label {
       display: block;
-      font-size: 13px;
+      font-size: clamp(10px, 3.2vw, 13px);
       font-weight: 600;
       color: var(--charcoal-light);
       margin-bottom: 6px;
@@ -123,9 +123,10 @@
       border: 1.5px solid #e2ded7;
       border-radius: 12px;
       padding: 12px 14px;
-      font-size: 15px;
+      font-size: clamp(13px, 3.8vw, 15px);
       font-family: inherit;
       color: var(--charcoal);
+      min-width: 0;
       transition: all 0.2s ease;
     }
 
@@ -139,6 +140,26 @@
       resize: none;
       height: 68px;
     }
+
+    /* Photo placeholder (top of card) */
+    .preview-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+      min-height: clamp(110px, 28vw, 170px);
+      margin-bottom: 18px;
+      padding: 12px;
+      text-align: center;
+      border: 2px dashed var(--gold-main);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.6);
+      color: var(--charcoal-light);
+    }
+    .preview-empty-title { font-size: clamp(12px, 3.6vw, 15px); font-weight: 600; color: var(--charcoal); }
+    .preview-empty-sub { font-size: clamp(10px, 3vw, 12px); }
 
     /* Action Buttons Row */
     .button-row {
@@ -491,6 +512,13 @@
 
     <!-- Upload Card -->
     <div class="upload-card">
+      <!-- Selected photos: placeholder shown until photos are chosen -->
+      <div id="previewEmpty" class="preview-empty">
+        <span class="preview-empty-title">Your photos will appear here</span>
+        <span class="preview-empty-sub">Take or choose photos below</span>
+      </div>
+      <div id="previewContainer" class="preview-grid" style="display: none;"></div>
+
       <div class="form-group">
         <label class="form-label" for="guestName">Your Name</label>
         <input type="text" id="guestName" class="form-input" placeholder="e.g., Sarah & Michael" maxlength="50">
@@ -516,9 +544,6 @@
           <span class="btn-sub">Pick from Gallery</span>
         </div>
       </div>
-
-      <!-- Selected Photos Previews -->
-      <div id="previewContainer" class="preview-grid" style="display: none;"></div>
 
       <!-- Cloudflare Turnstile bot verification -->
       <div class="cf-turnstile" data-sitekey="0x4AAAAAAFTDcWb8GFAkCNHZ" data-theme="dark" style="margin:14px 0;"></div>
@@ -572,6 +597,7 @@
     const guestNameInput = document.getElementById('guestName');
     const guestWishInput = document.getElementById('guestWish');
     const previewContainer = document.getElementById('previewContainer');
+    const previewEmpty = document.getElementById('previewEmpty');
     const uploadBtn = document.getElementById('uploadBtn');
     const selectedCountBadge = document.getElementById('selectedCountBadge');
     const progressContainer = document.getElementById('progressContainer');
@@ -613,6 +639,7 @@
       previewContainer.innerHTML = '';
       if (selectedFiles.length === 0) {
         previewContainer.style.display = 'none';
+        previewEmpty.style.display = 'flex';
         uploadBtn.disabled = true;
         uploadBtn.querySelector('span').innerText = 'Upload Photos';
         selectedCountBadge.innerText = '';
@@ -620,6 +647,7 @@
       }
 
       previewContainer.style.display = 'grid';
+      previewEmpty.style.display = 'none';
       uploadBtn.disabled = false;
       uploadBtn.querySelector('span').innerText = `Upload ${selectedFiles.length} Photo${selectedFiles.length > 1 ? 's' : ''}`;
 
