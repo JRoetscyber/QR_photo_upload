@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Canvas Confetti for celebratory upload effects -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Cloudflare Turnstile bot verification -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     :root {
       --gold-main: #d4af37;
@@ -518,6 +520,9 @@
       <!-- Selected Photos Previews -->
       <div id="previewContainer" class="preview-grid" style="display: none;"></div>
 
+      <!-- Cloudflare Turnstile bot verification -->
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFTDcWb8GFAkCNHZ" data-theme="dark" style="margin:14px 0;"></div>
+
       <!-- Submit Button -->
       <button id="uploadBtn" class="submit-btn" disabled onclick="handleUpload()">
         <span>Upload Photos</span>
@@ -690,6 +695,12 @@
     async function handleUpload() {
       if (selectedFiles.length === 0) return;
 
+      const turnstileToken = (typeof turnstile !== 'undefined') ? turnstile.getResponse() : '';
+      if (!turnstileToken) {
+        alert('Please complete the verification challenge before uploading.');
+        return;
+      }
+
       const guestName = guestNameInput.value.trim() || 'Anonymous Guest';
       const wish = guestWishInput.value.trim();
 
@@ -717,6 +728,7 @@
         formData.append('guest_name', guestName);
         formData.append('wish', (i === 0) ? wish : ''); // Attach wish to first photo
         formData.append('photos', file, file.name);
+        formData.append('cf_turnstile_token', turnstileToken);
 
         try {
           const res = await fetch('/api/upload', {
@@ -767,6 +779,8 @@
         showAlert('Upload failed. Please check your connection and try again.', 'error');
         uploadBtn.disabled = false;
       }
+
+      if (typeof turnstile !== 'undefined') turnstile.reset();
     }
 
     // Register Service Worker for Push Notifications

@@ -241,13 +241,15 @@ func (s *DB) RecordGuestUpload(guestName string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Update matching RSVP entries (by name or partial name match)
+	// Update the matching RSVP entry by exact (case-insensitive, trimmed) name match.
+	// A substring match here would also match unrelated guests sharing a short
+	// name fragment (e.g. "Jo" matching "Jonathan", "Joanna", ...).
 	query := `
-	UPDATE rsvps 
-	SET has_uploaded = 1, upload_count = upload_count + 1 
-	WHERE LOWER(name) LIKE LOWER(?) OR LOWER(?) LIKE '%' || LOWER(name) || '%';
+	UPDATE rsvps
+	SET has_uploaded = 1, upload_count = upload_count + 1
+	WHERE LOWER(TRIM(name)) = LOWER(?);
 	`
-	res, err := s.db.Exec(query, "%"+guestName+"%", guestName)
+	res, err := s.db.Exec(query, guestName)
 	if err == nil {
 		if rows, _ := res.RowsAffected(); rows > 0 {
 			s.warmupCache()

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"crypto/subtle"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -20,6 +21,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/etag"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/google/uuid"
@@ -74,6 +76,12 @@ func main() {
 	// Initialize Redis client for Blue/Green Pub-Sub and distributed caching
 	redisClient := storage.NewRedisClient()
 	defer redisClient.Close()
+
+	// Initialize Cloudflare Turnstile bot-verification guard for guest-facing forms
+	turnstileGuard := NewTurnstileGuard(os.Getenv("TURNSTILE_SECRET_KEY"))
+	if !turnstileGuard.Enabled() {
+		log.Printf("[Turnstile] TURNSTILE_SECRET_KEY not set — bot verification is DISABLED")
+	}
 
 	// Connect Redis Pub/Sub back to local SSE listeners
 	if redisClient.IsAvailable() {
@@ -143,11 +151,18 @@ func main() {
 			AdditionalGuests string `json:"additional_guests"`
 			SongRequest      string `json:"song_request"`
 			Message          string `json:"message"`
+			TurnstileToken   string `json:"cf_turnstile_token"`
 		}
 
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request payload",
+			})
+		}
+
+		if !turnstileGuard.Verify(req.TurnstileToken, c.IP()) {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error": "Bot verification failed. Please reload the page and try again.",
 			})
 		}
 
@@ -202,6 +217,16 @@ func main() {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Failed to parse multipart form data",
+			})
+		}
+
+		turnstileToken := ""
+		if tokens, ok := form.Value["cf_turnstile_token"]; ok && len(tokens) > 0 {
+			turnstileToken = tokens[0]
+		}
+		if !turnstileGuard.Verify(turnstileToken, c.IP()) {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error": "Bot verification failed. Please reload the page and try again.",
 			})
 		}
 
@@ -314,8 +339,24 @@ func main() {
 			_ = w.Flush()
 
 			for photo := range subChan {
-				data := fmt.Sprintf(`{"id":"%s","url":"%s","guest_name":"%s","wish":"%s","time":"%s","favorite":%t}`,
-					photo.ID, photo.URL, photo.GuestName, photo.Wish, photo.UploadTime.Format("15:04"), photo.Favorite)
+				data, err := json.Marshal(struct {
+					ID        string `json:"id"`
+					URL       string `json:"url"`
+					GuestName string `json:"guest_name"`
+					Wish      string `json:"wish"`
+					Time      string `json:"time"`
+					Favorite  bool   `json:"favorite"`
+				}{
+					ID:        photo.ID,
+					URL:       photo.URL,
+					GuestName: photo.GuestName,
+					Wish:      photo.Wish,
+					Time:      photo.UploadTime.Format("15:04"),
+					Favorite:  photo.Favorite,
+				})
+				if err != nil {
+					continue
+				}
 				fmt.Fprintf(w, "event: new_photo\ndata: %s\n\n", data)
 				if err := w.Flush(); err != nil {
 					return
@@ -368,6 +409,11 @@ func main() {
 
 	// ==================== ADMIN APIs ====================
 
+	// Constant-time PIN comparison to avoid leaking match length via timing
+	pinsMatch := func(a, b string) bool {
+		return subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1
+	}
+
 	// Admin Auth Middleware Helper
 	adminAuth := func(c *fiber.Ctx) error {
 		pin := c.Get("X-Admin-PIN")
@@ -377,7 +423,7 @@ func main() {
 		if pin == "" {
 			pin = c.Cookies("wedding_admin_pin")
 		}
-		if pin != AdminPIN {
+		if !pinsMatch(pin, AdminPIN) {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid or missing Admin PIN",
 			})
@@ -385,8 +431,11 @@ func main() {
 		return c.Next()
 	}
 
-	// Admin: Login / Verify PIN
-	app.Post("/api/admin/login", func(c *fiber.Ctx) error {
+	// Admin: Login / Verify PIN (rate-limited to slow down PIN brute-forcing)
+	app.Post("/api/admin/login", limiter.New(limiter.Config{
+		Max:        10,
+		Expiration: 1 * time.Minute,
+	}), func(c *fiber.Ctx) error {
 		var req struct {
 			PIN string `json:"pin"`
 		}
@@ -394,12 +443,12 @@ func main() {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 		}
 
-		if req.PIN == AdminPIN {
+		if pinsMatch(req.PIN, AdminPIN) {
 			c.Cookie(&fiber.Cookie{
 				Name:     "wedding_admin_pin",
 				Value:    AdminPIN,
 				Expires:  time.Now().Add(30 * 24 * time.Hour),
-				HTTPOnly: false,
+				HTTPOnly: true,
 				SameSite: "Lax",
 			})
 			return c.JSON(fiber.Map{

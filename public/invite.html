@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Canvas Confetti for celebratory RSVP feedback -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Cloudflare Turnstile bot verification -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     :root {
       --gold-savannah: #d4a359;
@@ -102,19 +104,21 @@
     }
 
     /* Hero Section with Highveld Landscape Vibe */
-    .hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 100px 20px 60px;
-      background: linear-gradient(180deg, rgba(22, 38, 27, 0.78) 0%, rgba(36, 61, 44, 0.85) 60%, rgba(249, 245, 239, 1) 100%),
-                  radial-gradient(circle at 50% 30%, #d4a359 0%, #16261b 80%);
-      color: white;
-    }
+      .hero {
+          background-image: linear-gradient(180deg, rgb(38 48 41 / 59%) 70%, rgba(249, 245, 239, 1) 100%), url(background.jpeg);
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: cover;
+          position: relative;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 100px 20px 60px;
+          color: white;
+      }
 
     .hero-protea-icon {
       font-size: 42px;
@@ -717,7 +721,7 @@
         <h2>Please RSVP</h2>
         <div class="divider"></div>
         <p style="color:rgba(255,255,255,0.7); margin-top:12px; font-size:14px;">
-          Please kindly let us know by <strong>1 December 2026</strong> so we can reserve your seat at our harvest table.
+          Please kindly let us know by <strong>20 November 2026</strong> so we can reserve your seat at our harvest table.
         </p>
       </div>
 
@@ -782,6 +786,8 @@
             <label class="form-label" for="guestMessage">Message or Blessing for the Couple</label>
             <textarea id="guestMessage" class="form-textarea" placeholder="Leave a warm message for Jonathan & Julene..."></textarea>
           </div>
+
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFTDcWb8GFAkCNHZ" data-theme="dark" style="margin:14px 0;"></div>
 
           <button type="submit" id="rsvpBtn" class="submit-rsvp-btn">
             Send RSVP Confirmation
@@ -873,6 +879,12 @@
       const alertBox = document.getElementById('rsvpAlert');
       const isAttending = document.querySelector('input[name="attendance"]:checked').value === 'true';
 
+      const turnstileToken = (typeof turnstile !== 'undefined') ? turnstile.getResponse() : '';
+      if (!turnstileToken) {
+        alert('Please complete the verification challenge before submitting.');
+        return;
+      }
+
       const payload = {
         name: document.getElementById('guestName').value.trim(),
         phone: document.getElementById('guestPhone').value.trim(),
@@ -881,7 +893,8 @@
         guest_count: isAttending ? parseInt(document.getElementById('guestCount').value, 10) : 0,
         additional_guests: isAttending ? document.getElementById('additionalGuests').value.trim() : '',
         song_request: isAttending ? document.getElementById('songRequest').value.trim() : '',
-        message: document.getElementById('guestMessage').value.trim()
+        message: document.getElementById('guestMessage').value.trim(),
+        cf_turnstile_token: turnstileToken
       };
 
       btn.disabled = true;
@@ -912,11 +925,13 @@
           alertBox.style.display = 'block';
         } else {
           alert('Submission failed: ' + (data.error || 'Please check your inputs'));
+          if (typeof turnstile !== 'undefined') turnstile.reset();
           btn.disabled = false;
           btn.innerText = 'Send RSVP Confirmation';
         }
       } catch (err) {
         alert('Network connection error. Please try again.');
+        if (typeof turnstile !== 'undefined') turnstile.reset();
         btn.disabled = false;
         btn.innerText = 'Send RSVP Confirmation';
       }

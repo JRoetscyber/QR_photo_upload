@@ -659,8 +659,8 @@
     <div class="pin-card">
       <div class="crown-big" style="font-family:'Cormorant Garamond',serif; font-size:32px; letter-spacing:4px; color:var(--gold); font-weight:700;">J &amp; J</div>
       <h2>Couple's Suite</h2>
-      <p>Enter your 4-digit Wedding PIN to unlock</p>
-      <input type="password" id="pinInput" class="pin-input" maxlength="4" placeholder="••••" autofocus>
+      <p>Enter your Admin PIN to unlock</p>
+      <input type="password" id="pinInput" class="pin-input" maxlength="64" placeholder="Admin PIN" autofocus>
       <button class="pin-btn" onclick="submitPIN()">Unlock Admin Suite</button>
       <div id="pinError" class="pin-error">Incorrect PIN. Try again.</div>
     </div>
@@ -904,7 +904,7 @@
     }
 
     pinInput.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter' || pinInput.value.length === 4) {
+      if (e.key === 'Enter') {
         submitPIN();
       }
     });

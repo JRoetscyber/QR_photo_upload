@@ -30,3 +30,12 @@ env/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Secrets
+.env
+
+# Generated QR output, VS state, dev screenshots/scripts
+qr_output/
+.vs/
+screenshots/
+inspect_nav.py

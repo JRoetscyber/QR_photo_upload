@@ -1,329 +1,257 @@
 #!/usr/bin/env python3
 """
-Wedding QR Code & Table Stand Generator
-Detects the local Wi-Fi IP address, generates a high-resolution QR code PNG,
-creates a printable table-stand card HTML file, and outputs an ASCII QR code to the terminal.
+Wedding QR Code & Table Stand Generator.
+
+Production (default) - QR opens the guest photo upload page (/photos):
+    python generate_qr.py
+    python generate_qr.py --url https://jjwed.co.za
+
+Local / venue Wi-Fi testing:
+    python generate_qr.py --local [--ip 192.168.1.20] [--port 5167]
+
+Outputs (in --out-dir, default ./qr_output):
+    wedding_qr.png         print-resolution QR with champagne frame
+    wedding_qr.svg         vector QR (scales infinitely for print shops)
+    table_stand_card.html  self-contained printable card (QR embedded)
 """
 
-import sys
+import argparse
+import base64
+import html
+import io
 import os
 import socket
-import argparse
+import sys
+from urllib.parse import urlparse
 
-# Ensure UTF-8 output on Windows consoles
-if hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
-import qrcode
-from PIL import Image, ImageDraw
+try:
+    import qrcode
+    import qrcode.image.svg
+    from PIL import Image, ImageDraw
+except ImportError:
+    sys.exit("Missing dependencies. Install with: pip install qrcode pillow")
+
+UPLOAD_PATH = "/photos"  # guest photo upload portal route (see main.go); "/" is the invitation page
+DEFAULT_URL = os.environ.get("WEDDING_URL", "https://jjwed.co.za")
+DARK = "#2b2d42"
+
 
 def get_local_ip():
-    """Finds the best local LAN/Wi-Fi IPv4 address."""
-    # First try connecting to a public DNS IP to determine the outbound Wi-Fi adapter
+    """Best LAN IPv4 address (used only with --local)."""
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.settimeout(0.5)
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-        s.close()
-        if ip and not ip.startswith("127."):
-            return ip
-    except Exception:
-        pass
-
-    # Fallback to hostname lookup
-    try:
-        hostname = socket.gethostname()
-        for ip in socket.gethostbyname_ex(hostname)[2]:
-            if not ip.startswith("127.") and not ip.startswith("169.254."):
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.settimeout(0.5)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            if ip and not ip.startswith("127."):
                 return ip
-    except Exception:
+    except OSError:
         pass
-
+    try:
+        for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
+            if not ip.startswith(("127.", "169.254.")):
+                return ip
+    except OSError:
+        pass
     return "127.0.0.1"
 
-def generate_styled_qr(url, output_png="wedding_qr.png"):
-    """Generates a high-quality styled QR code with subtle elegant styling."""
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=12,
-        border=3,
-    )
+
+def normalize_url(raw, allow_insecure=False):
+    """Validate and normalise the target URL."""
+    raw = raw.strip()
+    if "://" not in raw:
+        raw = "https://" + raw
+    parsed = urlparse(raw)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        sys.exit(f"Invalid URL: {raw!r}")
+    if parsed.scheme == "http" and not allow_insecure:
+        sys.exit("Refusing http:// for a production QR code (phone cameras warn on it). "
+                 "Use https://, or pass --local for LAN testing.")
+    host = parsed.hostname or ""
+    if not allow_insecure and (host in ("localhost", "example.com") or host.startswith(("127.", "192.168.", "10."))
+                               or host.endswith("yourdomain.com")):
+        sys.exit(f"{host!r} is not a public production host. Pass --url with the real domain.")
+    # A bare domain means "the upload page": guests must land on the photo portal, not the invitation.
+    return raw.rstrip("/") + UPLOAD_PATH if not parsed.path.strip("/") else raw.rstrip("/")
+
+
+def build_qr(url, error_correction=qrcode.constants.ERROR_CORRECT_Q, box_size=20, border=4):
+    qr = qrcode.QRCode(version=None, error_correction=error_correction, box_size=box_size, border=border)
     qr.add_data(url)
     qr.make(fit=True)
+    return qr
 
-    # Base QR Code
-    img = qr.make_image(fill_color="#2b2d42", back_color="#ffffff").convert("RGBA")
-    
-    # Add a delicate gold/champagne outer frame
-    border_width = 24
+
+def write_png(url, path):
+    """High-resolution PNG (quiet zone preserved) inside a subtle champagne frame."""
+    qr = build_qr(url)
+    img = qr.make_image(fill_color=DARK, back_color="#ffffff").convert("RGBA")
+    pad = 48
     w, h = img.size
-    card_size = (w + border_width * 2, h + border_width * 2)
-    card = Image.new("RGBA", card_size, (255, 255, 255, 255))
-    
-    draw = ImageDraw.Draw(card)
-    # Subtle champagne border
-    draw.rectangle([6, 6, card_size[0] - 7, card_size[1] - 7], outline="#d4af37", width=3)
-    draw.rectangle([12, 12, card_size[0] - 13, card_size[1] - 13], outline="#f3e5ab", width=1)
-    
-    # Paste QR code in center
-    card.paste(img, (border_width, border_width), img)
-    card.save(output_png)
-    print(f"✅ Generated high-resolution QR code PNG: {output_png}")
-    return output_png
+    size = (w + pad * 2, h + pad * 2)
+    card = Image.new("RGBA", size, (255, 255, 255, 255))
+    d = ImageDraw.Draw(card)
+    d.rectangle([10, 10, size[0] - 11, size[1] - 11], outline="#d4af37", width=5)
+    d.rectangle([22, 22, size[0] - 23, size[1] - 23], outline="#f3e5ab", width=2)
+    card.paste(img, (pad, pad))
+    card.save(path, dpi=(300, 300), optimize=True)
+    return path
 
-def generate_table_card_html(url, ip, port, output_html="table_stand_card.html"):
-    """Generates a printable, elegant wedding table card."""
-    html_content = f"""<!DOCTYPE html>
+
+def write_svg(url, path):
+    qr = build_qr(url, box_size=10)
+    img = qr.make_image(image_factory=qrcode.image.svg.SvgPathImage)
+    img.save(path)
+    return path
+
+
+def png_data_uri(path):
+    with open(path, "rb") as f:
+        return "data:image/png;base64," + base64.b64encode(f.read()).decode("ascii")
+
+
+CARD_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Share Your Wedding Memories - Table Card</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
-  <style>
-    :root {{
-      --gold-primary: #c59b27;
-      --gold-light: #f5e6be;
-      --charcoal: #2d3142;
-      --cream: #faf8f5;
-    }}
-    * {{
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }}
-    body {{
-      font-family: 'Montserrat', sans-serif;
-      background: #eef1f6;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 24px;
-      color: var(--charcoal);
-    }}
-    .print-actions {{
-      margin-bottom: 24px;
-      display: flex;
-      gap: 12px;
-    }}
-    .btn {{
-      background: var(--gold-primary);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 15px;
-      font-weight: 600;
-      border-radius: 30px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(197, 155, 39, 0.35);
-      transition: all 0.2s ease;
-    }}
-    .btn:hover {{
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(197, 155, 39, 0.45);
-    }}
-    .btn-secondary {{
-      background: white;
-      color: var(--charcoal);
-      border: 1px solid #ddd;
-    }}
-
-    /* Printable Card (4x6 / 5x7 ratio) */
-    .card {{
-      width: 380px;
-      min-height: 540px;
-      background: var(--cream);
-      border: 1px solid #e0d8cc;
-      border-radius: 16px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
-      padding: 36px 28px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }}
-    .card::before {{
-      content: '';
-      position: absolute;
-      inset: 12px;
-      border: 1.5px solid var(--gold-primary);
-      border-radius: 10px;
-      pointer-events: none;
-    }}
-    .card::after {{
-      content: '';
-      position: absolute;
-      inset: 16px;
-      border: 0.5px solid var(--gold-light);
-      border-radius: 8px;
-      pointer-events: none;
-    }}
-    .rings-icon {{
-      font-size: 32px;
-      margin-bottom: 6px;
-      color: var(--gold-primary);
-    }}
-    h1 {{
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 32px;
-      font-weight: 600;
-      color: var(--charcoal);
-      margin-bottom: 6px;
-      letter-spacing: 1px;
-    }}
-    .subtitle {{
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-style: italic;
-      font-size: 18px;
-      color: var(--gold-primary);
-      margin-bottom: 20px;
-    }}
-    .qr-container {{
-      background: white;
-      padding: 14px;
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      display: inline-block;
-      margin-bottom: 18px;
-      border: 1px solid #eee;
-    }}
-    .qr-container img {{
-      display: block;
-      width: 190px;
-      height: 190px;
-    }}
-    .instructions {{
-      font-size: 13px;
-      line-height: 1.6;
-      color: #555;
-      margin-bottom: 12px;
-    }}
-    .instructions strong {{
-      color: var(--charcoal);
-    }}
-    .url-badge {{
-      display: inline-block;
-      background: #f0ebe1;
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--charcoal);
-      letter-spacing: 0.5px;
-    }}
-    .wifi-note {{
-      font-size: 11px;
-      color: #888;
-      margin-top: 14px;
-    }}
-
-    @media print {{
-      body {{
-        background: white;
-        padding: 0;
-      }}
-      .print-actions {{
-        display: none;
-      }}
-      .card {{
-        box-shadow: none;
-        border: 1px solid #ccc;
-        margin: auto;
-        page-break-inside: avoid;
-      }}
-    }}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Table Card - Share Your Wedding Memories</title>
+<style>
+  @page {{ size: 4in 6in; margin: 0; }}
+  :root {{ --gold: #c59b27; --gold-light: #f5e6be; --charcoal: #2d3142; --cream: #faf8f5; }}
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  body {{
+    font-family: 'Montserrat', 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: #eef1f6; color: var(--charcoal);
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh; padding: 24px;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }}
+  .actions {{ margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }}
+  .btn {{
+    background: var(--gold); color: #fff; border: 0; padding: 12px 24px;
+    font-size: 15px; font-weight: 600; border-radius: 30px; cursor: pointer;
+    text-decoration: none;
+  }}
+  .btn.secondary {{ background: #fff; color: var(--charcoal); border: 1px solid #ddd; }}
+  .card {{
+    width: 4in; max-width: 100%; aspect-ratio: 2 / 3; background: var(--cream);
+    border: 1px solid #e0d8cc; border-radius: 12px;
+    padding: 0.35in 0.3in; text-align: center; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }}
+  .card::before {{ content: ''; position: absolute; inset: 0.12in; border: 1.5px solid var(--gold); border-radius: 8px; }}
+  .card::after {{ content: ''; position: absolute; inset: 0.16in; border: 0.5px solid var(--gold-light); border-radius: 6px; }}
+  h1 {{ font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px; font-weight: 600; letter-spacing: 1px; margin-bottom: 4px; }}
+  .names {{ font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 18px; color: var(--gold); margin-bottom: 18px; }}
+  .qr {{ background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 16px; }}
+  .qr img {{ display: block; width: min(2.1in, 52vw); height: auto; aspect-ratio: 1; image-rendering: pixelated; }}
+  .instructions {{ font-size: 13px; line-height: 1.6; color: #555; margin-bottom: 12px; }}
+  .url {{ max-width: 100%; overflow-wrap: anywhere; display: inline-block; background: #f0ebe1; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: .5px; }}
+  @media (max-width: 480px) {{
+    body {{ padding: 16px 12px; }}
+    .btn {{ flex: 1 1 100%; text-align: center; padding: 14px 20px; }}
+    h1 {{ font-size: clamp(22px, 7vw, 30px); }}
+    .instructions {{ font-size: 12px; }}
+  }}
+  @media print {{
+    body {{ background: #fff; padding: 0; min-height: 0; display: block; }}
+    .actions {{ display: none; }}
+    .card {{ width: 4in; height: 6in; aspect-ratio: auto; border: 0; border-radius: 0; margin: 0; page-break-inside: avoid; }}
+    .qr img {{ width: 2.1in; }}
+  }}
+</style>
 </head>
 <body>
-
-  <div class="print-actions">
-    <button class="btn" onclick="window.print()">🖨️ Print Table Stand Card</button>
-    <a href="{url}" target="_blank" style="text-decoration:none;">
-      <button class="btn btn-secondary">🌐 Open Web Upload Portal</button>
-    </a>
+  <div class="actions">
+    <button class="btn" onclick="window.print()">Print table card</button>
+    <a class="btn secondary" href="{url}" target="_blank" rel="noopener">Open upload portal</a>
   </div>
-
   <div class="card">
-    <div class="rings-icon">💍</div>
     <h1>Capture the Love</h1>
-    <div class="subtitle">Share your photos from tonight</div>
-
-    <div class="qr-container">
-      <img src="wedding_qr.png" alt="Wedding Upload QR Code">
-    </div>
-
-    <p class="instructions">
-      Open your phone camera, scan the QR code,<br>
-      and upload all your candid moments!
-    </p>
-
-    <div class="url-badge">{url}</div>
-
-    <p class="wifi-note">
-      📶 Connect to the venue Wi-Fi to upload instantly!
-    </p>
+    <div class="names">{names}</div>
+    <div class="qr"><img src="{qr_data}" alt="QR code linking to {url}"></div>
+    <p class="instructions">Open your phone camera, scan the code,<br>and share your photos from today.</p>
+    <div class="url">{display_url}</div>
   </div>
-
 </body>
 </html>
 """
-    with open(output_html, "w", encoding="utf-8") as f:
-        f.write(html_content)
-    print(f"✅ Generated printable table-stand HTML card: {output_html}")
-    return output_html
+
+
+def write_card(url, png_path, path, names):
+    display = urlparse(url)
+    display_url = (display.netloc + display.path).rstrip("/")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(CARD_TEMPLATE.format(
+            url=html.escape(url, quote=True),
+            display_url=html.escape(display_url),
+            names=html.escape(names),
+            qr_data=png_data_uri(png_path),
+        ))
+    return path
+
 
 def print_terminal_qr(url):
-    """Prints a beautiful ASCII QR code directly into the terminal."""
-    print("\n" + "="*50)
-    print(" 📸 WEDDING PHOTO UPLOAD - SCAN WITH YOUR PHONE")
-    print("="*50 + "\n")
-    
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=1,
-        border=2,
-    )
+    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=1, border=2)
     qr.add_data(url)
     qr.make(fit=True)
+    print()
     qr.print_ascii(invert=True)
-    
-    print("\n" + "="*50)
-    print(f" 🌐 Access URL: {url}")
-    print("="*50 + "\n")
+    print(f"\n  {url}\n")
+
+
+def verify_decodes(png_path, url):
+    """Best-effort round-trip check; silently skipped if no decoder is installed."""
+    try:
+        import cv2
+    except ImportError:
+        return None
+    img = cv2.imread(png_path)
+    if img is None:
+        return False
+    data, _, _ = cv2.QRCodeDetector().detectAndDecode(img)
+    return data == url
+
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate Wedding Wi-Fi / Domain QR Code")
-    parser.add_argument("--url", type=str, default=None, help="Custom public domain URL (e.g. https://photos.yourdomain.com)")
-    parser.add_argument("--ip", type=str, default=None, help="Explicit IP address (defaults to auto-detected Wi-Fi IP)")
-    parser.add_argument("--port", type=int, default=5167, help="Server port (default: 5167)")
-    args = parser.parse_args()
+    p = argparse.ArgumentParser(description="Generate the wedding upload QR code and table card.")
+    p.add_argument("--url", help=f"Public URL to encode (default: $WEDDING_URL or {DEFAULT_URL})")
+    p.add_argument("--local", action="store_true", help="Use http://<LAN-IP>:<port> for venue/LAN testing")
+    p.add_argument("--ip", help="LAN IP for --local (auto-detected by default)")
+    p.add_argument("--port", type=int, default=5167, help="Port for --local (default: 5167)")
+    p.add_argument("--names", default="Jonathan & Julene", help="Names shown on the card")
+    p.add_argument("--out-dir", default="qr_output", help="Output directory (default: qr_output)")
+    p.add_argument("--no-terminal", action="store_true", help="Do not print the ASCII QR")
+    args = p.parse_args()
 
-    if args.url:
-        url = args.url.rstrip("/")
-        ip = "Domain / Cloudflare"
-        port = ""
+    if args.local:
+        url = f"http://{args.ip or get_local_ip()}:{args.port}{UPLOAD_PATH}"
+        print("WARNING: --local QR codes only work on the same network. Do not print these for the event.")
     else:
-        ip = args.ip if args.ip else get_local_ip()
-        port = args.port
-        url = f"http://{ip}:{port}"
+        url = normalize_url(args.url or DEFAULT_URL)
 
-    print(f"📡 Target Host: {ip}")
-    print(f"🔗 Target Wedding Upload URL: {url}")
+    os.makedirs(args.out_dir, exist_ok=True)
+    png = write_png(url, os.path.join(args.out_dir, "wedding_qr.png"))
+    svg = write_svg(url, os.path.join(args.out_dir, "wedding_qr.svg"))
+    card = write_card(url, png, os.path.join(args.out_dir, "table_stand_card.html"), args.names)
 
-    # Generate PNG
-    generate_styled_qr(url, "wedding_qr.png")
-    
-    # Generate Printable Card
-    generate_table_card_html(url, ip, port, "table_stand_card.html")
+    print(f"Target URL: {url}")
+    for path in (png, svg, card):
+        print(f"Wrote {path}")
 
-    # Output terminal QR
-    print_terminal_qr(url)
+    ok = verify_decodes(png, url)
+    if ok is True:
+        print("Verified: PNG decodes back to the target URL.")
+    elif ok is False:
+        sys.exit("ERROR: generated PNG did not decode to the target URL.")
+
+    if not args.no_terminal:
+        print_terminal_qr(url)
+
 
 if __name__ == "__main__":
     main()
