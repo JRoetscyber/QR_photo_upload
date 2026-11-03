@@ -51,12 +51,12 @@ type Store struct {
 
 // NewStore initializes directories, loads existing metadata, and sets up concurrency bounds.
 func NewStore(uploadDir, dataFile string, maxConcurrentDiskWrites int) (*Store, error) {
-	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+	if err := os.MkdirAll(uploadDir, 0750); err != nil {
 		return nil, fmt.Errorf("failed to create upload dir: %w", err)
 	}
 
 	dataDir := filepath.Dir(dataFile)
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
+	if err := os.MkdirAll(dataDir, 0750); err != nil {
 		return nil, fmt.Errorf("failed to create data dir: %w", err)
 	}
 
@@ -72,7 +72,9 @@ func NewStore(uploadDir, dataFile string, maxConcurrentDiskWrites int) (*Store, 
 	}
 
 	// Load existing metadata if available
-	if data, err := os.ReadFile(dataFile); err == nil {
+	cleanDataFile := filepath.Clean(dataFile)
+	/* #nosec G304 - dataFile is internal storage metadata path */
+	if data, err := os.ReadFile(cleanDataFile); err == nil {
 		var loaded []PhotoMetadata
 		if err := json.Unmarshal(data, &loaded); err == nil {
 			s.photos = loaded
@@ -153,9 +155,14 @@ func (s *Store) SaveUploadedFile(fileHeader *multipart.FileHeader, guestName, wi
 	}
 
 	diskFilename := fmt.Sprintf("%s_%s_%s%s", timestamp, cleanGuest, id[:8], ext)
-	diskPath := filepath.Join(s.uploadDir, diskFilename)
 
-	dst, err := os.Create(diskPath)
+	uploadRoot, err := os.OpenRoot(s.uploadDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open upload root: %w", err)
+	}
+	defer uploadRoot.Close()
+
+	dst, err := uploadRoot.Create(diskFilename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create destination file: %w", err)
 	}
@@ -324,9 +331,14 @@ func (s *Store) StreamAllPhotosZip(w io.Writer) error {
 	zipWriter := zip.NewWriter(w)
 	defer zipWriter.Close()
 
+	uploadRoot, err := os.OpenRoot(s.uploadDir)
+	if err != nil {
+		return fmt.Errorf("failed to open upload root: %w", err)
+	}
+	defer uploadRoot.Close()
+
 	for _, p := range photosCopy {
-		filePath := filepath.Join(s.uploadDir, p.Filename)
-		file, err := os.Open(filePath)
+		file, err := uploadRoot.Open(filepath.Base(p.Filename))
 		if err != nil {
 			continue // Skip missing files gracefully
 		}
@@ -335,7 +347,7 @@ func (s *Store) StreamAllPhotosZip(w io.Writer) error {
 		if cleanGuest == "" {
 			cleanGuest = "Guest"
 		}
-		zipEntryName := fmt.Sprintf("%s_%s", cleanGuest, p.Filename)
+		zipEntryName := fmt.Sprintf("%s_%s", cleanGuest, filepath.Base(p.Filename))
 
 		header := &zip.FileHeader{
 			Name:     zipEntryName,
@@ -345,12 +357,12 @@ func (s *Store) StreamAllPhotosZip(w io.Writer) error {
 
 		entryWriter, err := zipWriter.CreateHeader(header)
 		if err != nil {
-			file.Close()
+			_ = file.Close()
 			continue
 		}
 
 		_, _ = io.Copy(entryWriter, file)
-		file.Close()
+		_ = file.Close()
 	}
 
 	return nil
@@ -387,7 +399,8 @@ func (s *Store) saveMetadataLocked() {
 	if err != nil {
 		return
 	}
-	_ = os.WriteFile(s.dataFile, data, 0644)
+	cleanDataFile := filepath.Clean(s.dataFile)
+	_ = os.WriteFile(cleanDataFile, data, 0600)
 }
 
 func sanitizeString(s string) string {

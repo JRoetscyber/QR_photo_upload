@@ -79,7 +79,7 @@ type DB struct {
 
 // NewDB initializes the SQLite database with high-performance PRAGMAs: WAL mode, 256MB MMAP, 64MB Cache
 func NewDB(dbPath string) (*DB, error) {
-	if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0750); err != nil {
 		return nil, fmt.Errorf("failed to create db directory: %w", err)
 	}
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -59,11 +60,12 @@ func NewRedisClient() *RedisClient {
 		ctx:    ctx,
 	}
 
+	safeAddr := strings.ReplaceAll(strings.ReplaceAll(addr, "\n", ""), "\r", "")
 	if err := rdb.Ping(pingCtx).Err(); err != nil {
-		log.Printf("[Redis] Redis not reachable at %s (%v) — operating in fast in-memory fallback mode", addr, err)
+		log.Printf("[Redis] Redis not reachable at %s (%v) — operating in fast in-memory fallback mode", safeAddr, err)
 		rc.available = false
 	} else {
-		log.Printf("[Redis] Connected successfully to Redis at %s (Pub/Sub & Distributed Cache Active)", addr)
+		log.Printf("[Redis] Connected successfully to Redis at %s (Pub/Sub & Distributed Cache Active)", safeAddr)
 		rc.available = true
 	}
 
